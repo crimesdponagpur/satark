@@ -306,6 +306,7 @@ body.hid .veil{display:grid}
       <div class="grid" id="catGrid"></div>
       <h2>तपासणी बाकी (आज किंवा आधीची तारीख)</h2>
       <div class="card list" id="dueList"></div>
+      <div id="reqBox" hidden><h2>निगराणी बंद करण्याच्या विनंत्या (SDPO निर्णय)</h2><div class="card list" id="reqList"></div></div>
       <div id="endBox" hidden><h2>हद्दपार कालावधी 15 दिवसांत संपतो</h2><div class="card list" id="endList"></div></div>
     </div>
     <div class="tab" id="t-list">
@@ -482,6 +483,9 @@ body.hid .veil{display:grid}
     $('catGrid').querySelectorAll('[data-cat]').forEach(function (x) { x.onclick = function () { S.cat = x.getAttribute('data-cat'); go('list'); search(); }; });
     $('dueList').innerHTML = b.due.length ? b.due.map(function (r) { return item(r, 'तपासणी: ' + dmy(r.nextCheck) + (r.lastCheck ? ' • मागील ' + dmy(r.lastCheck) : ' • अजून एकही नाही')); }).join('') : '<div class="empty">सध्या कोणतीही तपासणी बाकी नाही ✓</div>';
     bindItems($('dueList'));
+    $('reqBox').hidden = !(b.pend && b.pend.length);
+    $('reqList').innerHTML = (b.pend || []).map(function (r) { return item(r, 'विनंती: ' + esc(r.req.to) + ' • ' + dmy(r.req.date) + ' • ' + esc(r.req.by)); }).join('');
+    bindItems($('reqList'));
     $('endBox').hidden = !b.ending.length;
     $('endList').innerHTML = b.ending.map(function (r) { return item(r, 'हद्दपार ' + dmy(r.toDate) + ' पर्यंत'); }).join('');
     bindItems($('endList'));
@@ -543,7 +547,7 @@ body.hid .veil{display:grid}
   function renderRec() {
     var r = S.rec, me = S.boot.me, L = S.boot.sensL;
     $('rSub').textContent = catL(r.cat) + ' • ' + psName(r.ps);
-    var h = '<div class="card sec"><div class="hero"><div class="av" style="background:' + COLORS[r.cat] + '">' + LETTER[r.cat] + '</div><div><b>' + esc(r.name) + '</b>' +
+    var h = (r.pend ? '<div class="card sec" style="border-left:4px solid var(--gold);padding:12px 14px"><b>निगराणी बंद करण्याची विनंती प्रलंबित</b><div>' + esc(r.pend.to) + ' • ' + dmy(r.pend.date) + ' • ' + esc(r.pend.by) + '</div>' + (r.pend.note ? '<div class="hint">' + esc(r.pend.note) + '</div>' : '') + '</div>' : '') + '<div class="card sec"><div class="hero"><div class="av" style="background:' + COLORS[r.cat] + '">' + LETTER[r.cat] + '</div><div><b>' + esc(r.name) + '</b>' +
       (r.alias ? '<div style="color:var(--muted)">उर्फ ' + esc(r.alias) + '</div>' : '') + '<div style="margin-top:4px">' + stPill(r) + ' <span class="pill gray">' + esc(dmy(r.statusDate)) + '</span></div></div></div>' +
       kv([['वडील / पती', r.father], ['लिंग / वय', [r.sex, r.age ? r.age + ' वर्षे' : ''].filter(Boolean).join(', ')], ['गाव / वस्ती', r.village], ['वर्णन / खुणा', r.desc],
         ['गुन्हे', r.crimes], ['तपास / बीट अधिकारी', r.io], ['स्थिती शेरा', r.statusNote],
@@ -558,15 +562,18 @@ body.hid .veil{display:grid}
       else h += '</div><div style="padding:0 14px 14px">' + (r.hasSens ? '<p class="hint" style="margin:0 0 10px">पत्ता, मोबाईल, नातेवाईक, गुप्त शेरा इ. उघडल्यास तुमचे नाव, वेळ व कारण लॉगमध्ये जाते. 2 मिनिटांनी आपोआप लपते.</p><button class="btn gold wide" id="sShow">पाहा (कारण द्या)</button>' : '<p class="hint" style="margin:0">संवेदनशील माहिती भरलेली नाही.</p>') + '</div>';
       h += '</div>';
     }
-    if (me.w) h += '<div class="acts"><button class="btn pri" id="aStatus">स्थिती बदला</button><button class="btn" id="aCheck">तपासणी नोंद</button><button class="btn ghost" id="aEdit">माहिती बदला</button></div>';
+    if (me.w) h += '<div class="acts"><button class="btn pri" id="aAct">आदेश / अवस्था बदल</button><button class="btn" id="aStatus">स्थिती बदला</button><button class="btn" id="aCheck">तपासणी नोंद</button><button class="btn ghost" id="aEdit">माहिती बदला</button></div>';
     h += '<h2 class="sec" style="margin-bottom:8px">तपासण्या (' + r.checks.length + ')</h2><div class="card sec list">' + (r.checks.length ? r.checks.map(function (c) {
       return '<div class="chk"><b>' + dmy(c.date) + ' • ' + esc(c.found) + '</b>' + (c.place ? ' • ' + esc(c.place) : '') + (c.remark ? '<div>' + esc(c.remark) + '</div>' : '') + '<div class="hint">' + esc(c.by) + '</div></div>';
     }).join('') : '<div class="empty">अजून तपासणी नोंद नाही.</div>') + '</div>';
+    h += '<h2 class="sec" style="margin-bottom:8px">इतिहास (' + (r.hist || []).length + ')</h2><div class="card sec list">' + ((r.hist || []).length ? r.hist.map(function (x) {
+      return '<div class="chk"><b>' + dmy(x.date) + ' • ' + esc(TRL[x.act] || x.act) + '</b>' + (x.from || x.to ? ' • ' + esc(x.from) + ' → ' + esc(x.to) : '') + (x.ordNo ? '<div>आदेश क्र. ' + esc(x.ordNo) + (x.ordDate ? ' दि. ' + dmy(x.ordDate) : '') + '</div>' : '') + (x.note ? '<div>' + esc(x.note) + '</div>' : '') + '<div class="hint">' + esc(x.by) + '</div></div>';
+    }).join('') : '<div class="empty">अजून बदल नाही.</div>') + '</div>';
     if (me.admin) h += '<div class="acts"><button class="btn danger" id="aDel">ही नोंद काढा</button></div>';
     $('recBody').innerHTML = h;
     var on = function (id, f) { var el = $(id); if (el) el.onclick = f; };
     on('sShow', askSens); on('sHide', function () { clearTimeout(S.sensTimer); delete S.rec.sens; renderRec(); });
-    on('aStatus', statusDlg); on('aCheck', checkDlg); on('aDel', delDlg);
+    on('aStatus', statusDlg); on('aAct', actDlg); on('aCheck', checkDlg); on('aDel', delDlg);
     on('aEdit', function () {
       if (S.rec.hasSens && me.full && !S.rec.sens) {
         call('view', { id: S.rec.id, full: true, why: 'नोंद दुरुस्ती' }).then(function (x) { S.rec.sens = x.sens; openForm(S.rec); }).catch(fail);
@@ -582,6 +589,37 @@ body.hid .veil{display:grid}
     });
   }
   function today() { return S.boot.today; }
+  var TRL = { declare: 'फरार घोषित', caught: 'आरोपी सापडला / अटक', hsReq: 'निगराणी बंद करण्याची विनंती', hsClose: 'निगराणी बंद', hsReject: 'विनंती नाकारली', hsOpen: 'निगराणी सुरू', status: 'स्थिती बदल' };
+  function actDlg() {
+    var r = S.rec, me = S.boot.me, open = S.boot.cats[r.cat].open.indexOf(r.status) >= 0, a = [];
+    if (r.cat === 'PAHIJE' && open) a.push('declare');
+    if ((r.cat === 'PAHIJE' || r.cat === 'FARAR') && open) a.push('caught');
+    if (r.cat === 'HS') {
+      if (open && !r.pend) a.push('hsReq');
+      if (me.admin && open) a.push('hsClose');
+      if (me.admin && r.pend) a.push('hsReject');
+      if (me.admin && !open) a.push('hsOpen');
+    }
+    if (!a.length) { toast('या नोंदीसाठी कोणतीही कृती उपलब्ध नाही'); return; }
+    dlg('<h3>आदेश / अवस्था बदल</h3><label class="fl">कृती</label><select class="f" id="dAct">' + a.map(function (k) { return '<option value="' + k + '">' + esc(TRL[k]) + '</option>'; }).join('') + '</select>' +
+      '<p class="hint" id="dHint"></p><label class="fl">तारीख</label><input class="f" type="date" id="dDt" value="' + today() + '" max="' + today() + '">' +
+      '<div id="dTo"><label class="fl">कारण</label><select class="f" id="dToV"><option>मृत</option><option>इतर कारण</option></select></div>' +
+      '<div id="dOrd"><label class="fl" id="dOrdL">आदेश क्रमांक</label><input class="f" id="dOn" autocomplete="off"><label class="fl">आदेश तारीख</label><input class="f" type="date" id="dOd" max="' + today() + '"></div>' +
+      '<label class="fl">शेरा / तपशील</label><textarea class="f" id="dNote"></textarea>', function (b) {
+      var act = b.querySelector('#dAct').value;
+      call('transition', { id: r.id, act: act, date: b.querySelector('#dDt').value, to: b.querySelector('#dToV').value, ordNo: b.querySelector('#dOn').value, ordDate: b.querySelector('#dOd').value, note: b.querySelector('#dNote').value })
+        .then(function () { toast('नोंदवले ✓'); return call('init').then(function (x) { S.boot = x; renderHome(); }).catch(function () {}); }).then(function () { openRec(r.id); }).catch(fail);
+    });
+    var HINT = { declare: 'न्यायालयाने फरार घोषित केल्याचा आदेश क्रमांक भरा. नोंद पाहिजे यादीतून फरार यादीत जाईल.', caught: 'आरोपी सापडला / अटक झाल्यास नोंद चालू यादीतून कमी होते.', hsReq: 'पो.स्टे. विनंती करते; SDPO पोलीस अधीक्षक कार्यालयाचा आदेश भरून निगराणी बंद करेल.', hsClose: 'पोलीस अधीक्षक कार्यालयाचा (LCB) आदेश क्रमांक व तारीख आवश्यक.', hsReject: 'नाकारण्याचे कारण शेऱ्यात लिहा.', hsOpen: 'पोलीस अधीक्षक कार्यालयाचा निगराणी उघडण्याचा आदेश क्रमांक व तारीख आवश्यक.' };
+    var sync = function () {
+      var b = $('dlgBx'), k = b.querySelector('#dAct').value;
+      b.querySelector('#dHint').textContent = HINT[k];
+      b.querySelector('#dTo').hidden = !(k === 'hsReq' || k === 'hsClose');
+      b.querySelector('#dOrd').hidden = k === 'caught' || k === 'hsReq' || k === 'hsReject';
+      b.querySelector('#dOrdL').textContent = k === 'declare' ? 'न्यायालय आदेश क्रमांक' : 'पो. अधीक्षक कार्यालय आदेश क्रमांक';
+    };
+    $('dlgBx').querySelector('#dAct').onchange = sync; sync();
+  }
   function statusDlg() {
     var r = S.rec, st = S.boot.cats[r.cat].st;
     dlg('<h3>स्थिती बदला</h3><label class="fl">नवीन स्थिती</label><select class="f" id="dSt">' + st.map(function (s) { return '<option' + (s === r.status ? ' selected' : '') + '>' + esc(s) + '</option>'; }).join('') + '</select>' +
