@@ -552,6 +552,12 @@ nav.bot button.on:before{content:"";position:absolute;top:0;left:30%;right:30%;h
   // ---------- सुरुवात ----------
   function boot() {
     return call('init').then(function (b) {
+      // जुना सर्व्हर (नवीन Code.gs अजून Deploy केलेला नाही) असल्यासही चालावे
+      if (b.recs) return b;
+      b.foundBy = b.foundBy || { HS: b.found, PAHIJE: ['शोध घेतला, मिळून आला नाही', 'मिळून आला', 'इतर'], FARAR: ['शोध घेतला, मिळून आला नाही', 'मिळून आला', 'इतर'] };
+      b.docKinds = b.docKinds || [];
+      return call('list', {}).then(function (rows) { b.recs = rows; return b; });
+    }).then(function (b) {
       S.boot = b;
       $('lockScr').hidden = true; $('appScr').hidden = false;
       $('hWho').textContent = b.me.name + ' • ' + (b.me.ps ? psName(b.me.ps) : 'सर्व पो.स्टे.');
@@ -620,7 +626,7 @@ nav.bot button.on:before{content:"";position:absolute;top:0;left:30%;right:30%;h
     $('resCnt').textContent = rows.length + ' नोंदी' + (rows.length > 200 ? ' (पहिल्या 200 दाखवल्या, शोध नेमका करा)' : '');
     bindItems($('resList'));
   }
-  function refresh() { return call('init').then(function (b) { S.boot = b; S.fetched = Date.now(); renderHome(); search(); }).catch(function () {}); }
+  function refresh() { return call('init').then(function (b) { if (!b.recs) { b.recs = S.boot.recs; b.foundBy = S.boot.foundBy; b.docKinds = S.boot.docKinds; } S.boot = b; S.fetched = Date.now(); renderHome(); search(); }).catch(function () {}); }
   var sT; $('sQ').oninput = function () { clearTimeout(sT); sT = setTimeout(search, 120); };
   $('sF').onsubmit = function (e) { e.preventDefault(); search(); };
   $('sPs').onchange = search; $('sOpen').onchange = search;
@@ -678,14 +684,14 @@ nav.bot button.on:before{content:"";position:absolute;top:0;left:30%;right:30%;h
     var r = S.rec, me = S.boot.me, L = S.boot.sensL, tab = S.recTab || 'info', ld = !!r.loading, isH = r.cat === 'HS';
     var chk = r.checks || [], hist = r.hist || [], docs = r.docs || [], col = COLORS[r.cat] || '#334155';
     $('rSub').textContent = catL(r.cat) + ' • ' + psName(r.ps);
-    var photo = r.photo ? '<img class="ph" id="phImg" src="' + r.photo + '" alt="">' : (me.w && me.full ? '<button class="phx" id="phAdd" type="button">+ फोटो<br>जोडा</button>' : '<div class="av" style="background:' + col + '1f;color:' + col + ';width:64px;height:64px;font-size:24px;border-radius:16px">' + (LETTER[r.cat] || '•') + '</div>');
+    var photo = r.photo ? '<img class="ph" id="phImg" src="' + r.photo + '" alt="">' : (me.w && me.full && S.boot.docKinds.length ? '<button class="phx" id="phAdd" type="button">+ फोटो<br>जोडा</button>' : '<div class="av" style="background:' + col + '1f;color:' + col + ';width:64px;height:64px;font-size:24px;border-radius:16px">' + (LETTER[r.cat] || '•') + '</div>');
     var facts = [catL(r.cat), psName(r.ps), r.village, r.age ? r.age + ' वर्षे' : ''].filter(Boolean).map(function (x) { return '<span>' + esc(x) + '</span>'; }).join('');
     var h = (r.pend ? '<div class="banner"><b>निगराणी बंद करण्याची विनंती प्रलंबित</b><div>' + esc(r.pend.to) + ' • ' + dmy(r.pend.date) + ' • ' + esc(r.pend.by) + '</div>' + (r.pend.note ? '<div class="hint">' + esc(r.pend.note) + '</div>' : '') + '</div>' : '') +
       '<div class="card sec"><div class="hero">' + photo + '<div style="min-width:0"><b>' + esc(r.name) + '</b>' + (r.alias ? '<div style="color:var(--muted)">उर्फ ' + esc(r.alias) + '</div>' : '') +
       '<div style="margin-top:6px">' + stPill(r) + (r.statusDate ? ' <span class="pill gray">' + esc(dmy(r.statusDate)) + '</span>' : '') + '</div><div class="facts">' + facts + '</div></div></div></div>';
     if (me.w) h += '<div class="acts"><button class="btn pri" id="aAct"' + (ld ? ' disabled' : '') + '>आदेश / अवस्था बदल</button><button class="btn" id="aCheck">' + (isH ? 'तपासणी नोंद' : 'शोध नोंद') + '</button><button class="btn ghost" id="aEdit">माहिती बदला</button><button class="btn ghost" id="aStatus">इतर स्थिती</button></div>';
     var segs = [['info', 'माहिती'], ['checks', isH ? 'तपासण्या' : 'शोध', chk.length], ['hist', 'इतिहास', hist.length]];
-    if (me.full) segs.push(['docs', 'कागदपत्रे', docs.length]);
+    if (me.full && S.boot.docKinds.length) segs.push(['docs', 'कागदपत्रे', docs.length]);
     h += '<div class="seg">' + segs.map(function (g) { return '<button data-tab="' + g[0] + '" class="' + (tab === g[0] ? 'on' : '') + '">' + g[1] + (g[2] != null && !ld ? '<em>' + g[2] + '</em>' : '') + '</button>'; }).join('') + '</div>';
     if (tab === 'info') {
       h += '<div class="card sec">' + (kv([['वडील / पती', r.father], ['लिंग / वय', [r.sex, r.age ? r.age + ' वर्षे' : ''].filter(Boolean).join(', ')], ['गाव / वस्ती', r.village], ['वर्णन / खुणा', r.desc],
@@ -748,7 +754,7 @@ nav.bot button.on:before{content:"";position:absolute;top:0;left:30%;right:30%;h
     });
   }
   function attachHtml(def, label) {
-    var me = S.boot.me; if (!me.w || !me.full) return '';
+    var me = S.boot.me; if (!me.w || !me.full || !S.boot.docKinds.length) return '';
     return '<label class="fl">' + esc(label || 'कागदपत्र / फोटो जोडा (ऐच्छिक)') + '</label><select class="f" id="dKind">' + S.boot.docKinds.map(function (k) { return '<option' + (k === def ? ' selected' : '') + '>' + esc(k) + '</option>'; }).join('') + '</select>' +
       '<input class="f" type="file" id="dFile" accept="application/pdf,image/jpeg,image/png" style="margin-top:8px"><p class="hint">PDF / JPG / PNG, कमाल 5 MB. फक्त तुमच्या Drive च्या खाजगी फोल्डरमध्ये साठवले जाते.</p>';
   }
