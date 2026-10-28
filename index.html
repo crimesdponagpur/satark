@@ -404,7 +404,7 @@ nav.bot button.on:before{content:"";position:absolute;top:0;left:30%;right:30%;h
       <h2>तपासणी बाकी (आज किंवा आधीची तारीख)</h2>
       <div class="card list" id="dueList"></div>
       <div id="reqBox" hidden><h2>निगराणी बंद करण्याच्या विनंत्या (उपविभागीय कार्यालयाचा निर्णय)</h2><div class="card list" id="reqList"></div></div>
-      <div id="endBox" hidden><h2>हद्दपार कालावधी 15 दिवसांत संपतो</h2><div class="card list" id="endList"></div></div>
+      <div id="endBox" hidden><h2>हद्दपार कालावधी संपत आला / संपला (15 दिवस)</h2><div class="card list" id="endList"></div></div>
     </div>
     <div class="tab" id="t-list">
       <form class="search" id="sF"><input class="f" id="sQ" type="search" placeholder="नाव, उपनाव, गाव, अप.क्र., HS क्र." autocomplete="off" spellcheck="false"><button class="btn" type="submit">शोधा</button></form>
@@ -583,6 +583,8 @@ nav.bot button.on:before{content:"";position:absolute;top:0;left:30%;right:30%;h
   function bindItems(el) { el.querySelectorAll('[data-rec]').forEach(function (b) { b.onclick = function () { openRec(b.getAttribute('data-rec')); }; }); }
 
   var ICON = { FARAR: '<path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17h.01"/>', PAHIJE: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>', HS: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>', HADPAR: '<path d="M3 12h18M15 6l6 6-6 6"/>' };
+  function daysTo(d) { return Math.round((new Date(d + 'T12:00:00') - new Date(S.boot.today + 'T12:00:00')) / 864e5); }
+  function endTxt(r) { var n = daysTo(r.toDate); return n < 0 ? '⚠ हद्दपार कालावधी संपला ' + dmy(r.toDate) + ' (' + (-n) + ' दिवसांपूर्वी). स्थिती अद्ययावत करा' : 'हद्दपार ' + dmy(r.toDate) + ' ला संपतो (' + n + ' दिवस बाकी)'; }
   function renderHome() {
     var b = S.boot, n = 0, d = new Date(), days = ['रविवार', 'सोमवार', 'मंगळवार', 'बुधवार', 'गुरुवार', 'शुक्रवार', 'शनिवार'];
     Object.keys(b.cats).forEach(function (k) { n += b.cnt[k].open; });
@@ -598,7 +600,7 @@ nav.bot button.on:before{content:"";position:absolute;top:0;left:30%;right:30%;h
     $('reqList').innerHTML = (b.pend || []).map(function (r) { return item(r, 'विनंती: ' + esc(r.req.to) + ' • ' + dmy(r.req.date) + ' • ' + esc(r.req.by)); }).join('');
     bindItems($('reqList'));
     $('endBox').hidden = !b.ending.length;
-    $('endList').innerHTML = b.ending.map(function (r) { return item(r, 'हद्दपार ' + dmy(r.toDate) + ' पर्यंत'); }).join('');
+    $('endList').innerHTML = b.ending.map(function (r) { return item(r, endTxt(r)); }).join('');
     bindItems($('endList'));
   }
   function renderListCtl() {
@@ -688,6 +690,7 @@ nav.bot button.on:before{content:"";position:absolute;top:0;left:30%;right:30%;h
     $('rSub').textContent = catL(r.cat) + ' • ' + psName(r.ps);
     var photo = r.photo ? '<img class="ph" id="phImg" src="' + r.photo + '" alt="">' : (me.w && me.full && S.boot.docKinds.length ? '<button class="phx" id="phAdd" type="button">+ फोटो<br>जोडा</button>' : '<div class="av" style="background:' + col + '1f;color:' + col + ';width:64px;height:64px;font-size:24px;border-radius:16px">' + (LETTER[r.cat] || '•') + '</div>');
     var facts = [catL(r.cat), psName(r.ps), r.village, r.age ? r.age + ' वर्षे' : ''].filter(Boolean).map(function (x) { return '<span>' + esc(x) + '</span>'; }).join('');
+    if (r.cat === 'HADPAR' && r.toDate && ['हद्दपार चालू', 'उल्लंघन'].indexOf(r.status) >= 0) { var nd = daysTo(r.toDate); facts += '<span style="' + (nd <= 15 ? 'color:var(--bad);border-color:var(--bad);font-weight:700' : '') + '">' + (nd < 0 ? 'कालावधी संपला' : 'संपायला ' + nd + ' दिवस') + '</span>'; }
     var h = (r.pend ? '<div class="banner"><b>निगराणी बंद करण्याची विनंती प्रलंबित</b><div>' + esc(r.pend.to) + ' • ' + dmy(r.pend.date) + ' • ' + esc(r.pend.by) + '</div>' + (r.pend.note ? '<div class="hint">' + esc(r.pend.note) + '</div>' : '') + '</div>' : '') +
       '<div class="card sec"><div class="hero">' + photo + '<div style="min-width:0"><b>' + esc(r.name) + '</b>' + (r.alias ? '<div style="color:var(--muted)">उर्फ ' + esc(r.alias) + '</div>' : '') +
       '<div style="margin-top:6px">' + stPill(r) + (r.statusDate ? ' <span class="pill gray">' + esc(dmy(r.statusDate)) + '</span>' : '') + '</div><div class="facts">' + facts + '</div></div></div></div>';
@@ -698,7 +701,7 @@ nav.bot button.on:before{content:"";position:absolute;top:0;left:30%;right:30%;h
     if (tab === 'info') {
       h += '<div class="card sec">' + (kv([['वडील / पती', r.father], ['लिंग / वय', [r.sex, r.age ? r.age + ' वर्षे' : ''].filter(Boolean).join(', ')], ['गाव / वस्ती', r.village], ['वर्णन / खुणा', r.desc],
         ['गुन्हे', r.crimes], ['तपास / बीट अधिकारी', r.io], ['स्थिती शेरा', r.statusNote],
-        ['वॉरंट / जाहीरनामा', r.warrant], ['HS क्र.', r.hsNo], ['HS उघडली', dmy(r.hsDate)],
+        [r.cat === 'HADPAR' ? 'MPA कलम / प्रस्ताव' : 'वॉरंट / जाहीरनामा', r.warrant], ['HS क्र.', r.hsNo], ['HS उघडली', dmy(r.hsDate)],
         ['हद्दपार आदेश', [r.ordNo, dmy(r.ordDate)].filter(Boolean).join(' दि. ')], ['कालावधी', r.fromDate || r.toDate ? dmy(r.fromDate) + ' ते ' + dmy(r.toDate) : ''], ['हद्दपार क्षेत्र', r.area],
         ['तपासणी दर', r.every ? 'दर ' + r.every + ' दिवसांनी' : ''], ['पुढची तपासणी', dmy(r.nextCheck)],
         ['नोंद', dmy(r.created) + ' (' + r.cBy + ')'], ['शेवटचा बदल', dmy(r.updated) + ' (' + r.uBy + ')']]) || '<div class="empty">माहिती नाही.</div>') + '</div>';
@@ -835,12 +838,19 @@ nav.bot button.on:before{content:"";position:absolute;top:0;left:30%;right:30%;h
     $('dlgBx').querySelector('#dAct').onchange = sync; sync();
   }
   function statusDlg() {
-    var r = S.rec, st = S.boot.cats[r.cat].st;
-    dlg('<h3>स्थिती बदला</h3><label class="fl">नवीन स्थिती</label><select class="f" id="dSt">' + st.map(function (s) { return '<option' + (s === r.status ? ' selected' : '') + '>' + esc(s) + '</option>'; }).join('') + '</select>' +
-      '<label class="fl">तारीख</label><input class="f" type="date" id="dDt" value="' + today() + '" max="' + today() + '"><label class="fl">शेरा (उदा. अटक करणारे अधिकारी, कोर्ट)</label><input class="f" id="dNote" autocomplete="off">', function (b) {
-      call('setStatus', { id: r.id, status: b.querySelector('#dSt').value, date: b.querySelector('#dDt').value, note: b.querySelector('#dNote').value })
-        .then(function () { toast('स्थिती बदलली ✓'); return refresh(); }).then(function () { openRec(r.id); }).catch(fail);
+    var r = S.rec, st = S.boot.cats[r.cat].st, hp = r.cat === 'HADPAR', ix = st.indexOf(r.status), pre = hp && ix >= 0 && ix < 5 ? st[ix + 1] : r.status;
+    dlg('<h3>' + (hp ? 'हद्दपार: टप्पा / स्थिती बदला' : 'स्थिती बदला') + '</h3>' + (hp ? '<p class="hint">प्रस्तावित → SP कार्यालय (LCB) → SDM → SDPO चौकशी → SDM निर्णय → हद्दपार आदेश / रद्द</p>' : '') +
+      '<label class="fl">नवीन स्थिती</label><select class="f" id="dSt">' + st.map(function (s) { return '<option' + (s === pre ? ' selected' : '') + '>' + esc(s) + '</option>'; }).join('') + '</select>' +
+      '<label class="fl">तारीख</label><input class="f" type="date" id="dDt" value="' + today() + '" max="' + today() + '">' +
+      (hp ? '<div id="dHp"><label class="fl">आदेश क्रमांक (SDM / SP)</label><input class="f" id="dOn" autocomplete="off"><label class="fl">आदेश तारीख</label><input class="f" type="date" id="dOd">' +
+        '<div id="dHo"><div class="two"><div><label class="fl">हद्दपार पासून</label><input class="f" type="date" id="dFr"></div><div><label class="fl">पर्यंत</label><input class="f" type="date" id="dTo2"></div></div>' +
+        '<label class="fl">हद्दपार क्षेत्र (जिल्हे / तालुके)</label><input class="f" id="dAr" autocomplete="off"></div></div>' : '') +
+      '<label class="fl">शेरा (उदा. ' + (hp ? 'पत्र क्र. व तारीख, चौकशी अहवाल' : 'अटक करणारे अधिकारी, कोर्ट') + ')</label><input class="f" id="dNote" autocomplete="off">' + attachHtml(hp ? 'न्यायालय आदेश' : 'SD नोंद पुरावा', 'कागदपत्र जोडा (पत्र / आदेश / SD नोंद PDF)'), function (b) {
+      var q = function (i) { var e = b.querySelector(i); return e ? e.value : ''; }, up = attach(b);
+      call('setStatus', { id: r.id, status: q('#dSt'), date: q('#dDt'), note: q('#dNote'), ordNo: q('#dOn'), ordDate: q('#dOd'), fromDate: q('#dFr'), toDate: q('#dTo2'), area: q('#dAr') })
+        .then(function (d) { return up(r.id, d.id); }).then(function () { toast('स्थिती बदलली ✓'); return refresh(); }).then(function () { openRec(r.id); }).catch(fail);
     });
+    if (hp) { var sy = function () { $('dHo').hidden = $('dSt').value !== 'हद्दपार चालू'; }; $('dSt').onchange = sy; sy(); }
   }
   function checkDlg() {
     var r = S.rec, isH = r.cat === 'HS', opts = S.boot.foundBy[r.cat] || S.boot.found;
@@ -875,6 +885,7 @@ nav.bot button.on:before{content:"";position:absolute;top:0;left:30%;right:30%;h
     ['statusRow', ''],
     ['h', 'प्रकारानुसार माहिती', 'catBox'],
     ['warrant', 'वॉरंट / जाहीरनामा / BNSS 84 माहिती', 'area', 0, 'FARAR PAHIJE'],
+    ['warrant', 'MPA कलम (55 / 56 / 57), प्रस्ताव व चौकशीची माहिती', 'area', 0, 'HADPAR'],
     ['two', [['hsNo', 'HS क्र.'], ['hsDate', 'HS उघडल्याची तारीख', 'date']], 'HS'],
     ['two', [['ordNo', 'हद्दपार आदेश क्र.'], ['ordDate', 'आदेश तारीख', 'date']], 'HADPAR'],
     ['two', [['fromDate', 'पासून', 'date'], ['toDate', 'पर्यंत', 'date']], 'HADPAR'],
@@ -917,7 +928,7 @@ nav.bot button.on:before{content:"";position:absolute;top:0;left:30%;right:30%;h
     };
     cat.onchange = function () {
       showOnly();
-      if (!r && !$('f_every').value) $('f_every').value = cat.value === 'HADPAR' ? '15' : '30';
+      if (!r && !$('f_every').value) $('f_every').value = cat.value === 'HADPAR' ? '' : '30';
     };
     if (r) {
       ['cat', 'ps', 'name', 'alias', 'father', 'sex', 'age', 'village', 'desc', 'crimes', 'io', 'warrant', 'hsNo', 'hsDate', 'ordNo', 'ordDate', 'fromDate', 'toDate', 'area', 'every'].forEach(function (k) { if ($('f_' + k)) $('f_' + k).value = r[k] || ''; });
@@ -1102,6 +1113,11 @@ nav.bot button.on:before{content:"";position:absolute;top:0;left:30%;right:30%;h
     return order.map(function (k) {
       var rs = by[k], c = rs[0].cat, ps = rs[0].ps, hs = c === 'HS';
       var who = function (r) { return r.name + (r.age ? ' वय ' + r.age + ' वर्ष' : '') + (r.addr ? ' रा. ' + r.addr : ''); };
+      if (c === 'HADPAR') {
+        var hh = ['अ.क्र.', 'पोस्टे', 'आरोपीचे नाव व पत्ता', 'गुन्हे / इतिवृत्त', 'MPA कलम / प्रस्ताव', 'आदेश क्र. व दिनांक', 'हद्दपार कालावधी', 'सद्यस्थिती'];
+        var hb = rs.map(function (r, i) { return [String(i + 1), psName(r.ps), who(r), String(r.crimes || '').replace(/^पो\.स्टे\.\s*\S+\s*/, ''), r.warrant || '', [r.ordNo, r.ordDate ? 'दि. ' + dmy(r.ordDate) : ''].filter(Boolean).join(' '), r.fromDate || r.toDate ? dmy(r.fromDate) + ' ते ' + dmy(r.toDate) : '', r.status + (r.statusNote ? ' (' + r.statusNote + ')' : '')]; });
+        return { title: 'पोलीस स्टेशन ' + psName(ps) + ' हद्दपार (MPA 55/56/57) प्रकरणांची यादी', head: hh, body: hb, w: [4, 8, 20, 20, 12, 12, 12, 12] };
+      }
       var head = hs ? ['अ.क्र.', 'पोलीस स्टेशन', 'निगराणी बदमाशाचे नाव / वय / पत्ता', 'निगराणी उघडल्याचे आदेश क्रमांक व दिनांक', 'सद्यस्थिती']
         : ['अ.क्र.', 'पोस्टे', 'अप.क्र. व कलम', 'आरोपीचे नाव व पत्ता', 'दोषारोपपत्र क्र.', 'केस क्रमांक', 'सद्यस्थिती'];
       var body = rs.map(function (r, i) {
