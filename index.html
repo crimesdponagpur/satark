@@ -13,8 +13,6 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="सतर्क">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700&display=swap">
 <script src="config.js"></script>
 <style>
 /* एक कॉलम (फोन), खाली 4 टॅब. नोंद व फॉर्म पूर्ण पानावर उघडतात. फोनमध्ये कोणतीही नोंद साठवली जात नाही. */
@@ -23,7 +21,7 @@
   --navy:#0b1f4b;--navy2:#13306e;--pri:#1d4ed8;--pri-l:#eaf0ff;--gold:#c8961a;--gold-l:#fdf6e3;
   --ok:#047857;--ok-l:#e7f6ef;--warn:#a45a05;--warn-l:#fff4e0;--bad:#b91c1c;--bad-l:#fdecec;
   --sh:0 1px 2px rgba(15,23,42,.05),0 2px 8px rgba(15,23,42,.06);--r:16px;
-  --font:"Mukta","Noto Sans Devanagari","Mangal",system-ui,sans-serif}
+  --font:"Noto Sans Devanagari","Kohinoor Devanagari","Nirmala UI","Mangal",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0a1020;--card:#121a2e;--ink:#e7ecf5;--ink2:#c3cbe0;--muted:#8b97b3;--line:#22304d;
   --navy:#0b1736;--navy2:#1a2c5c;--pri:#7aa2ff;--pri-l:#17244a;--gold:#e0b44a;--gold-l:#2a2310;
@@ -201,6 +199,7 @@ body.hid .veil{display:grid}
   nav.bot button.on{background:rgba(255,255,255,.14);color:#fff}
   nav.bot button.add{color:#ffd966;margin-top:12px;border:1px dashed rgba(255,217,102,.45)}
   .grid{grid-template-columns:repeat(3,1fr);gap:16px}
+  .grid .cat:last-child:nth-child(odd){grid-column:auto}
   .cat{padding:20px}.cat b{font-size:38px}
   #resList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
   #resList .it{min-width:0;overflow:hidden}
@@ -212,6 +211,103 @@ body.hid .veil{display:grid}
   .page .inner{max-width:900px;padding-bottom:80px}
   .toast{bottom:28px}
   .dlg .bx{max-width:520px}
+}
+
+/* ===== नवा व्यावसायिक लुक ===== */
+:root{--sh:0 1px 2px rgba(11,31,75,.04),0 4px 14px rgba(11,31,75,.06);--sh2:0 2px 4px rgba(11,31,75,.06),0 12px 32px rgba(11,31,75,.12);--r:14px;--ease:cubic-bezier(.2,.7,.2,1)}
+html,body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body{background:var(--bg)}
+header.top{background:linear-gradient(135deg,#0a1c44 0%,#123072 100%);box-shadow:0 1px 0 rgba(255,255,255,.06) inset,0 6px 20px rgba(8,20,52,.25)}
+header.top b{font-weight:700;letter-spacing:.2px}
+.ib{transition:background .15s,transform .1s}.ib:active{transform:scale(.94);background:rgba(255,255,255,.2)}
+.card{border-color:rgba(15,23,42,.07)}
+:root[data-theme="dark"] .card{border-color:var(--line)}
+.btn{box-shadow:0 1px 2px rgba(11,31,75,.18);transition:transform .1s var(--ease),box-shadow .15s,filter .15s}
+.btn:active{transform:scale(.97)}.btn:hover{filter:brightness(1.06)}
+.btn.ghost{box-shadow:none}
+input.f,select.f,textarea.f{transition:border-color .15s,box-shadow .15s;border-radius:10px}
+input.f:focus,select.f:focus,textarea.f:focus{outline:0;border-color:var(--pri);box-shadow:0 0 0 3px rgba(29,78,216,.18)}
+h2{text-transform:none;font-size:13px;letter-spacing:.06em;color:var(--muted);font-weight:700}
+.hello{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:2px 2px 16px}
+.hello b{display:block;font-size:22px;line-height:1.25;letter-spacing:-.1px}
+.hello span{color:var(--muted);font-size:13.5px}
+.hello .dt{font-size:13px;color:var(--muted);text-align:right;white-space:nowrap}
+.grid{gap:12px}
+.cat{position:relative;overflow:hidden;padding:16px;border:1px solid rgba(15,23,42,.07);transition:transform .15s var(--ease),box-shadow .2s;display:block;width:100%}
+.cat:hover{transform:translateY(-2px);box-shadow:var(--sh2)}.cat:active{transform:scale(.98)}
+.cat .ic{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;margin-bottom:12px}
+.cat .ic svg{width:20px;height:20px}
+.cat i{display:none}
+.grid .cat:last-child:nth-child(odd){grid-column:1/-1}
+.cat b{font-size:34px;font-weight:800;letter-spacing:-.5px}
+.cat span{font-size:14.5px;color:var(--ink2)}
+.cat:after{content:"";position:absolute;right:-26px;top:-26px;width:90px;height:90px;border-radius:50%;background:var(--cc);opacity:.07}
+.list .it{transition:background .12s;padding:13px 16px;align-items:center}
+.list .it:hover{background:rgba(29,78,216,.04)}.list .it:active{background:rgba(29,78,216,.08)}
+.av{font-size:15px;font-weight:800;letter-spacing:0;border-radius:12px}
+.it .m b{font-size:15.5px;font-weight:650;letter-spacing:-.05px}
+.it .m span{font-size:12.8px}
+.it .pill{align-self:flex-start;margin-top:2px}
+.pill{font-weight:700;padding:2px 9px;font-size:11.8px}
+.search{position:sticky;top:0;z-index:5;background:var(--bg);padding:6px 0 8px;margin:-6px 0 4px;gap:0}
+.search input{border-radius:12px;padding:13px 14px 13px 42px;background:var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-4-4'/%3E%3C/svg%3E") no-repeat 14px center;box-shadow:var(--sh)}
+.search .btn{display:none}
+.chips button{transition:all .15s}
+.chips button.on{box-shadow:0 2px 8px rgba(11,31,75,.25)}
+.cnt{color:var(--muted);font-size:12.5px;margin:2px 4px 8px}
+/* स्केलेटन */
+.sk{position:relative;overflow:hidden;background:var(--line);border-radius:8px}
+.sk:after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);animation:shim 1.1s infinite}
+@keyframes shim{to{transform:translateX(100%)}}
+.skrow{display:flex;gap:12px;padding:14px 16px;align-items:center}
+.skrow .a{width:40px;height:40px;border-radius:12px}.skrow .l{flex:1;display:grid;gap:7px}.skrow .l i{height:11px;border-radius:6px}
+/* नोंद पान */
+.hero{padding:18px;gap:16px}
+.hero .ph{width:78px;height:96px;border-radius:12px;object-fit:cover;flex:none;box-shadow:var(--sh);background:var(--line);cursor:pointer}
+.hero .phx{width:78px;height:96px;border-radius:12px;flex:none;display:grid;place-items:center;border:1.5px dashed var(--line);color:var(--muted);font-size:12px;text-align:center;background:var(--bg);line-height:1.3;cursor:pointer;padding:4px}
+.hero b{font-size:21px;letter-spacing:-.2px}
+.facts{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.facts span{font-size:12.5px;color:var(--ink2);background:var(--bg);border:1px solid var(--line);padding:2px 9px;border-radius:20px}
+.seg{display:flex;gap:4px;background:rgba(100,116,139,.12);padding:4px;border-radius:12px;margin:14px 16px 0;overflow-x:auto;scrollbar-width:none}
+.seg button{flex:1;border:0;background:none;padding:8px 10px;border-radius:9px;font-weight:650;font-size:13.8px;color:var(--ink2);white-space:nowrap;transition:all .15s}
+.seg button.on{background:var(--card);color:var(--pri);box-shadow:var(--sh)}
+.seg em{font-style:normal;font-size:11.5px;background:var(--pri-l);color:var(--pri);padding:0 6px;border-radius:10px;margin-left:4px}
+.acts{margin-top:12px}
+.acts .btn{font-size:14.5px;padding:11px 12px}
+.banner{margin:14px 16px 0;padding:12px 14px;border-radius:12px;border:1px solid rgba(200,150,26,.4);background:var(--gold-l);color:var(--ink)}
+.kv{padding:6px 16px 14px;gap:0 14px;grid-template-columns:128px 1fr}
+.kv dt,.kv dd{padding:9px 0;border-bottom:1px solid var(--line)}
+.kv dt:nth-last-of-type(1),.kv dd:last-child{border-bottom:0}
+.doc{display:flex;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);width:100%;background:none;border-left:0;border-right:0;border-top:0;text-align:left}
+.doc:last-child{border-bottom:0}.doc:hover{background:rgba(29,78,216,.04)}
+.doc .di{width:38px;height:38px;border-radius:10px;background:var(--pri-l);color:var(--pri);display:grid;place-items:center;font-size:11px;font-weight:800;flex:none}
+.doc .dm{flex:1;min-width:0}.doc .dm b{display:block;font-size:14.5px}.doc .dm span{display:block;font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.att{display:inline-block;margin:6px 6px 0 0;font-size:12.5px;background:var(--pri-l);color:var(--pri);border:0;border-radius:20px;padding:3px 10px;font-weight:650}
+.chk{padding:12px 16px}
+.tl{position:relative;padding:4px 16px 8px 34px}
+.tl .ev{position:relative;padding:10px 0 12px;border-bottom:1px solid var(--line)}.tl .ev:last-child{border-bottom:0}
+.tl .ev:before{content:"";position:absolute;left:-22px;top:15px;width:10px;height:10px;border-radius:50%;background:var(--pri);box-shadow:0 0 0 4px var(--pri-l)}
+.tl:before{content:"";position:absolute;left:16px;top:18px;bottom:20px;width:2px;background:var(--line)}
+.tl .ev b{font-size:14.5px}
+/* खिडकी */
+.dlg{background:rgba(5,12,30,.5);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+.dlg .bx{border-radius:22px 22px 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.25);animation:sheet .22s var(--ease)}
+.dlg .bx:before{content:"";display:block;width:38px;height:4px;border-radius:4px;background:var(--line);margin:-6px auto 12px}
+@keyframes sheet{from{transform:translateY(30px);opacity:.4}to{transform:none;opacity:1}}
+@media(min-width:600px){.dlg .bx{border-radius:20px}.dlg .bx:before{display:none}}
+.page.on{animation:pg .2s var(--ease)}
+@keyframes pg{from{opacity:.4;transform:translateX(16px)}to{opacity:1;transform:none}}
+.pill.cat0{background:var(--bad-l);color:var(--bad)}
+nav.bot{box-shadow:0 -4px 20px rgba(11,31,75,.06)}
+nav.bot button{position:relative;transition:color .15s}
+nav.bot button.on:before{content:"";position:absolute;top:0;left:30%;right:30%;height:3px;border-radius:0 0 4px 4px;background:var(--pri)}
+@media(min-width:900px){
+  nav.bot button.on:before{display:none}
+  .hello b{font-size:28px}
+  .hero{padding:24px}.hero .ph,.hero .phx{width:96px;height:118px}
+  .seg{max-width:560px}
+  main{padding-top:32px}
+  .search{position:static;background:none;margin:0 0 8px}
 }
 
 /* सुरुवातीचे लोगो ॲनिमेशन */
@@ -302,6 +398,7 @@ body.hid .veil{display:grid}
   </header>
   <main>
     <div class="tab on" id="t-home">
+      <div class="hello" id="hello"></div>
       <h2>चालू नोंदी</h2>
       <div class="grid" id="catGrid"></div>
       <h2>तपासणी बाकी (आज किंवा आधीची तारीख)</h2>
@@ -313,7 +410,8 @@ body.hid .veil{display:grid}
       <form class="search" id="sF"><input class="f" id="sQ" type="search" placeholder="नाव, उपनाव, गाव, अप.क्र., HS क्र." autocomplete="off" spellcheck="false"><button class="btn" type="submit">शोधा</button></form>
       <div class="chips" id="catChips"></div>
       <div class="row2"><select class="f" id="sPs"></select><label class="tog"><input type="checkbox" id="sOpen" checked> फक्त चालू</label></div>
-      <div class="card list" id="resList"><div class="empty">प्रकार निवडा किंवा शोधा.</div></div>
+      <div class="cnt" id="resCnt"></div>
+      <div class="card list" id="resList"><div class="skrow"><div class="a sk"></div><div class="l"><i class="sk" style="width:60%"></i><i class="sk" style="width:40%"></i></div></div></div>
     </div>
     <div class="tab" id="t-more">
       <div class="card" id="moreBox"></div>
@@ -429,8 +527,9 @@ body.hid .veil{display:grid}
   /** सर्व माहिती मेमरी व स्क्रीनवरून पुसून लॉगिन पान */
   function lock(msg) {
     S.token = ''; S.boot = null; S.list = []; S.rec = null; clearTimeout(S.sensTimer);
-    ['recBody', 'fBody', 'mBody', 'catGrid', 'dueList', 'endList', 'moreBox', 'printArea', 'dlgBx'].forEach(function (i) { $(i).innerHTML = ''; });
-    $('resList').innerHTML = '<div class="empty">प्रकार निवडा किंवा शोधा.</div>'; $('sQ').value = '';
+    (S.urls || []).forEach(function (u) { try { URL.revokeObjectURL(u); } catch (e) {} }); S.urls = [];
+    ['recBody', 'fBody', 'mBody', 'catGrid', 'dueList', 'endList', 'moreBox', 'printArea', 'dlgBx', 'hello', 'resCnt'].forEach(function (i) { $(i).innerHTML = ''; });
+    $('resList').innerHTML = ''; $('sQ').value = '';
     document.querySelectorAll('.page.on,.dlg.on').forEach(function (x) { x.classList.remove('on'); });
     $('appScr').hidden = true; $('pwScr').hidden = true; $('lockScr').hidden = false;
     $('lPw').value = ''; showUrlBox(!apiUrl());
@@ -458,7 +557,7 @@ body.hid .veil{display:grid}
       $('hWho').textContent = b.me.name + ' • ' + (b.me.ps ? psName(b.me.ps) : 'सर्व पो.स्टे.');
       $('newBtn').hidden = !b.me.w;
       $('ver').textContent = 'आवृत्ती ' + b.v + ' • माहिती फक्त तुमच्या Google Sheet मध्ये.';
-      renderHome(); renderListCtl(); renderMore();
+      S.fetched = Date.now(); renderHome(); renderListCtl(); renderMore(); search();
     }).catch(function (e) { if (S.token) lock(e.message); });
   }
   function psName(c) { var p = (S.boot.ps || []).filter(function (x) { return x[0] === c; })[0]; return p ? p[1] : c; }
@@ -469,16 +568,21 @@ body.hid .veil{display:grid}
     return '<span class="pill ' + cls + '">' + esc(r.status) + '</span>';
   }
   function item(r, extra) {
-    return '<button class="it" data-rec="' + esc(r.id) + '"><div class="av" style="background:' + (COLORS[r.cat] || '#334155') + '">' + (LETTER[r.cat] || '•') + '</div><div class="m"><b>' + esc(r.name) +
+    var c = COLORS[r.cat] || '#334155';
+    return '<button class="it" data-rec="' + esc(r.id) + '"><div class="av" style="background:' + c + '1f;color:' + c + '">' + (LETTER[r.cat] || '•') + '</div><div class="m"><b>' + esc(r.name) +
       (r.alias ? ' <small style="font-weight:400;color:var(--muted)">उर्फ ' + esc(r.alias) + '</small>' : '') + '</b><span>' + esc(catL(r.cat)) + ' • ' + esc(psName(r.ps)) + (r.village ? ' • ' + esc(r.village) : '') +
       '</span><span>' + (extra || esc((r.crimes || '').split('\n')[0])) + '</span></div>' + stPill(r) + '</button>';
   }
   function bindItems(el) { el.querySelectorAll('[data-rec]').forEach(function (b) { b.onclick = function () { openRec(b.getAttribute('data-rec')); }; }); }
 
+  var ICON = { FARAR: '<path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17h.01"/>', PAHIJE: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>', HS: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>', HADPAR: '<path d="M3 12h18M15 6l6 6-6 6"/>' };
   function renderHome() {
-    var b = S.boot;
+    var b = S.boot, n = 0, d = new Date(), days = ['रविवार', 'सोमवार', 'मंगळवार', 'बुधवार', 'गुरुवार', 'शुक्रवार', 'शनिवार'];
+    Object.keys(b.cats).forEach(function (k) { n += b.cnt[k].open; });
+    $('hello').innerHTML = '<div><b>नमस्कार, ' + esc(b.me.name) + '</b><span>' + n + ' चालू नोंदी' + (b.due.length ? ' • ' + b.due.length + ' तपासणी बाकी' : '') + '</span></div><div class="dt">' + days[d.getDay()] + '<br>' + dmy(b.today) + '</div>';
     $('catGrid').innerHTML = Object.keys(b.cats).map(function (k) {
-      return '<button class="cat" data-cat="' + k + '"><i style="background:' + COLORS[k] + '"></i><b>' + b.cnt[k].open + '</b><span>' + esc(b.cats[k].l) + '</span><small>एकूण ' + b.cnt[k].all + ' नोंदी</small></button>';
+      var c = COLORS[k] || '#334155';
+      return '<button class="cat" data-cat="' + k + '" style="--cc:' + c + '"><div class="ic" style="background:' + c + '1f;color:' + c + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (ICON[k] || '') + '</svg></div><b>' + b.cnt[k].open + '</b><span>' + esc(b.cats[k].l) + '</span><small>चालू • एकूण ' + b.cnt[k].all + '</small></button>';
     }).join('');
     $('catGrid').querySelectorAll('[data-cat]').forEach(function (x) { x.onclick = function () { S.cat = x.getAttribute('data-cat'); go('list'); search(); }; });
     $('dueList').innerHTML = b.due.length ? b.due.map(function (r) { return item(r, 'तपासणी: ' + dmy(r.nextCheck) + (r.lastCheck ? ' • मागील ' + dmy(r.lastCheck) : ' • अजून एकही नाही')); }).join('') : '<div class="empty">सध्या कोणतीही तपासणी बाकी नाही ✓</div>';
@@ -499,14 +603,25 @@ body.hid .veil{display:grid}
     markChips();
   }
   function markChips() { $('catChips').querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x.getAttribute('data-c') === S.cat); }); }
-  function search() {
-    markChips();
-    call('list', { q: $('sQ').value, cat: S.cat, ps: $('sPs').value, open: $('sOpen').checked }).then(function (rows) {
-      S.list = rows;
-      $('resList').innerHTML = rows.length ? rows.map(function (r) { return item(r); }).join('') + (rows.length >= 500 ? '<div class="empty">पहिल्या 500 नोंदी. शोध नेमका करा.</div>' : '') : '<div class="empty">नोंद सापडली नाही.</div>';
-      bindItems($('resList'));
-    }).catch(fail);
+  function filt() {
+    var q = $('sQ').value.trim().toLowerCase(), ps = $('sPs').value, open = $('sOpen').checked;
+    return S.boot.recs.filter(function (r) {
+      if (S.cat && r.cat !== S.cat) return false;
+      if (ps && r.ps !== ps) return false;
+      if (open && !isOpen(r)) return false;
+      return !q || [r.name, r.alias, r.father, r.village, r.crimes, r.hsNo, r.io, r.desc].join(' ').toLowerCase().indexOf(q) >= 0;
+    });
   }
+  /** सर्व नोंदी लॉगिनलाच आलेल्या असतात; शोध ॲपमध्येच होतो (तात्काळ) */
+  function search() {
+    markChips(); if (!S.boot) return;
+    var rows = filt(); S.list = rows;
+    $('resList').innerHTML = rows.length ? rows.slice(0, 200).map(function (r) { return item(r); }).join('') : '<div class="empty">नोंद सापडली नाही.</div>';
+    $('resCnt').textContent = rows.length + ' नोंदी' + (rows.length > 200 ? ' (पहिल्या 200 दाखवल्या, शोध नेमका करा)' : '');
+    bindItems($('resList'));
+  }
+  function refresh() { return call('init').then(function (b) { S.boot = b; S.fetched = Date.now(); renderHome(); search(); }).catch(function () {}); }
+  var sT; $('sQ').oninput = function () { clearTimeout(sT); sT = setTimeout(search, 120); };
   $('sF').onsubmit = function (e) { e.preventDefault(); search(); };
   $('sPs').onchange = search; $('sOpen').onchange = search;
 
@@ -515,7 +630,7 @@ body.hid .veil{display:grid}
     document.querySelectorAll('nav.bot button').forEach(function (x) { x.classList.toggle('on', x.getAttribute('data-t') === t); });
     document.querySelectorAll('.tab').forEach(function (x) { x.classList.toggle('on', x.id === 't-' + t); });
     window.scrollTo(0, 0);
-    if (t === 'home') call('init').then(function (b) { S.boot = b; renderHome(); }).catch(fail);
+    if (t === 'home' && Date.now() - S.fetched > 60000) refresh();
   }
   document.querySelectorAll('nav.bot button').forEach(function (x) { x.onclick = function () { go(x.getAttribute('data-t')); }; });
   function openPg(id) { $(id).classList.add('on'); $(id).scrollTop = 0; }
@@ -523,11 +638,12 @@ body.hid .veil{display:grid}
   document.querySelectorAll('[data-close]').forEach(function (b) { b.onclick = function () { closePg(b.getAttribute('data-close')); }; });
 
   // ---------- खिडकी ----------
-  function dlg(html, onOk) {
-    $('dlgBx').innerHTML = html + '<div class="acts"><button class="btn ghost" data-x>रद्द</button><button class="btn pri" data-ok>पुढे</button></div>';
+  function dlg(html, onOk, o) {
+    o = o || {};
+    $('dlgBx').innerHTML = html + '<div class="acts">' + (o.noCancel ? '' : '<button class="btn ghost" data-x>रद्द</button>') + '<button class="btn pri" data-ok>' + (o.ok || 'पुढे') + '</button></div>';
     $('dlg').classList.add('on');
     var close = function () { $('dlg').classList.remove('on'); $('dlgBx').innerHTML = ''; };
-    $('dlgBx').querySelector('[data-x]').onclick = close;
+    var cx = $('dlgBx').querySelector('[data-x]'); if (cx) cx.onclick = close;
     $('dlgBx').querySelector('[data-ok]').onclick = function () { var r = onOk($('dlgBx')); if (r !== false) close(); };
     var f = $('dlgBx').querySelector('input,select,textarea'); if (f) f.focus();
   }
@@ -538,47 +654,135 @@ body.hid .veil{display:grid}
     rows = rows.filter(function (r) { return r[1]; });
     return rows.length ? '<dl class="kv">' + rows.map(function (r) { return '<dt>' + esc(r[0]) + '</dt><dd>' + esc(r[1]) + '</dd>'; }).join('') + '</dl>' : '';
   }
-  function openRec(id, full, why) {
-    return call('view', { id: id, full: !!full, why: why || '' }).then(function (r) {
-      S.rec = r; renderRec(); openPg('recPg');
-      if (full) { clearTimeout(S.sensTimer); S.sensTimer = setTimeout(function () { if (S.rec && S.rec.sens) { delete S.rec.sens; renderRec(); toast('संवेदनशील माहिती पुन्हा लपवली'); } }, SENS_HIDE_SEC * 1000); }
-    }).catch(fail);
+  var PHOTO = 'फोटो (पासपोर्ट साइज)';
+  function skel(n) {
+    var h = ''; for (var i = 0; i < (n || 4); i++) h += '<div class="skrow"><div class="a sk"></div><div class="l"><i class="sk" style="width:' + (55 + i * 8) + '%"></i><i class="sk" style="width:' + (35 + i * 6) + '%"></i></div></div>';
+    return h;
   }
+  function openRec(id, full, why) {
+    var pre = S.boot.recs.filter(function (x) { return x.id === id; })[0];
+    if (!(S.rec && S.rec.id === id)) {
+      S.recTab = 'info';
+      if (pre) { S.rec = JSON.parse(JSON.stringify(pre)); S.rec.loading = 1; renderRec(); } else { S.rec = null; $('recBody').innerHTML = '<div class="card sec">' + skel(4) + '</div>'; }
+      if (!$('recPg').classList.contains('on')) openPg('recPg');
+    }
+    return call('view', { id: id, full: !!full, why: why || '' }).then(function (r) {
+      S.rec = r; renderRec(); if (!$('recPg').classList.contains('on')) openPg('recPg');
+      if (full) { clearTimeout(S.sensTimer); S.sensTimer = setTimeout(function () { if (S.rec && S.rec.sens) { delete S.rec.sens; renderRec(); toast('संवेदनशील माहिती पुन्हा लपवली'); } }, SENS_HIDE_SEC * 1000); }
+    }).catch(function (e) { closePg('recPg'); fail(e); });
+  }
+  function docsOf(ref) { return (S.rec.docs || []).filter(function (d) { return d.ref === ref; }); }
+  function attLinks(ref) { return docsOf(ref).map(function (d) { return '<button class="att" data-doc="' + esc(d.id) + '">📎 ' + esc(d.kind) + '</button>'; }).join(''); }
+  function kb(n) { n = +n || 0; return n > 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB'; }
   function renderRec() {
-    var r = S.rec, me = S.boot.me, L = S.boot.sensL;
+    var r = S.rec, me = S.boot.me, L = S.boot.sensL, tab = S.recTab || 'info', ld = !!r.loading, isH = r.cat === 'HS';
+    var chk = r.checks || [], hist = r.hist || [], docs = r.docs || [], col = COLORS[r.cat] || '#334155';
     $('rSub').textContent = catL(r.cat) + ' • ' + psName(r.ps);
-    var h = (r.pend ? '<div class="card sec" style="border-left:4px solid var(--gold);padding:12px 14px"><b>निगराणी बंद करण्याची विनंती प्रलंबित</b><div>' + esc(r.pend.to) + ' • ' + dmy(r.pend.date) + ' • ' + esc(r.pend.by) + '</div>' + (r.pend.note ? '<div class="hint">' + esc(r.pend.note) + '</div>' : '') + '</div>' : '') + '<div class="card sec"><div class="hero"><div class="av" style="background:' + COLORS[r.cat] + '">' + LETTER[r.cat] + '</div><div><b>' + esc(r.name) + '</b>' +
-      (r.alias ? '<div style="color:var(--muted)">उर्फ ' + esc(r.alias) + '</div>' : '') + '<div style="margin-top:4px">' + stPill(r) + ' <span class="pill gray">' + esc(dmy(r.statusDate)) + '</span></div></div></div>' +
-      kv([['वडील / पती', r.father], ['लिंग / वय', [r.sex, r.age ? r.age + ' वर्षे' : ''].filter(Boolean).join(', ')], ['गाव / वस्ती', r.village], ['वर्णन / खुणा', r.desc],
+    var photo = r.photo ? '<img class="ph" id="phImg" src="' + r.photo + '" alt="">' : (me.w && me.full ? '<button class="phx" id="phAdd" type="button">+ फोटो<br>जोडा</button>' : '<div class="av" style="background:' + col + '1f;color:' + col + ';width:64px;height:64px;font-size:24px;border-radius:16px">' + (LETTER[r.cat] || '•') + '</div>');
+    var facts = [catL(r.cat), psName(r.ps), r.village, r.age ? r.age + ' वर्षे' : ''].filter(Boolean).map(function (x) { return '<span>' + esc(x) + '</span>'; }).join('');
+    var h = (r.pend ? '<div class="banner"><b>निगराणी बंद करण्याची विनंती प्रलंबित</b><div>' + esc(r.pend.to) + ' • ' + dmy(r.pend.date) + ' • ' + esc(r.pend.by) + '</div>' + (r.pend.note ? '<div class="hint">' + esc(r.pend.note) + '</div>' : '') + '</div>' : '') +
+      '<div class="card sec"><div class="hero">' + photo + '<div style="min-width:0"><b>' + esc(r.name) + '</b>' + (r.alias ? '<div style="color:var(--muted)">उर्फ ' + esc(r.alias) + '</div>' : '') +
+      '<div style="margin-top:6px">' + stPill(r) + (r.statusDate ? ' <span class="pill gray">' + esc(dmy(r.statusDate)) + '</span>' : '') + '</div><div class="facts">' + facts + '</div></div></div></div>';
+    if (me.w) h += '<div class="acts"><button class="btn pri" id="aAct"' + (ld ? ' disabled' : '') + '>आदेश / अवस्था बदल</button><button class="btn" id="aCheck">' + (isH ? 'तपासणी नोंद' : 'शोध नोंद') + '</button><button class="btn ghost" id="aEdit">माहिती बदला</button><button class="btn ghost" id="aStatus">इतर स्थिती</button></div>';
+    var segs = [['info', 'माहिती'], ['checks', isH ? 'तपासण्या' : 'शोध', chk.length], ['hist', 'इतिहास', hist.length]];
+    if (me.full) segs.push(['docs', 'कागदपत्रे', docs.length]);
+    h += '<div class="seg">' + segs.map(function (g) { return '<button data-tab="' + g[0] + '" class="' + (tab === g[0] ? 'on' : '') + '">' + g[1] + (g[2] != null && !ld ? '<em>' + g[2] + '</em>' : '') + '</button>'; }).join('') + '</div>';
+    if (tab === 'info') {
+      h += '<div class="card sec">' + (kv([['वडील / पती', r.father], ['लिंग / वय', [r.sex, r.age ? r.age + ' वर्षे' : ''].filter(Boolean).join(', ')], ['गाव / वस्ती', r.village], ['वर्णन / खुणा', r.desc],
         ['गुन्हे', r.crimes], ['तपास / बीट अधिकारी', r.io], ['स्थिती शेरा', r.statusNote],
         ['वॉरंट / जाहीरनामा', r.warrant], ['HS क्र.', r.hsNo], ['HS उघडली', dmy(r.hsDate)],
         ['हद्दपार आदेश', [r.ordNo, dmy(r.ordDate)].filter(Boolean).join(' दि. ')], ['कालावधी', r.fromDate || r.toDate ? dmy(r.fromDate) + ' ते ' + dmy(r.toDate) : ''], ['हद्दपार क्षेत्र', r.area],
         ['तपासणी दर', r.every ? 'दर ' + r.every + ' दिवसांनी' : ''], ['पुढची तपासणी', dmy(r.nextCheck)],
-        ['नोंद', dmy(r.created) + ' (' + r.cBy + ')'], ['शेवटचा बदल', dmy(r.updated) + ' (' + r.uBy + ')']]) + '</div>';
-    // संवेदनशील भाग
-    if (me.full) {
-      h += '<div class="card sec sens"><div class="hd"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>संवेदनशील माहिती</span>';
-      if (r.sens) h += '<button class="btn ghost" id="sHide" style="padding:6px 12px">लपवा</button></div>' + (kv(Object.keys(L).map(function (k) { return [L[k], r.sens[k]]; })) || '<div class="empty">काही भरलेले नाही.</div>');
-      else h += '</div><div style="padding:0 14px 14px">' + (r.hasSens ? '<p class="hint" style="margin:0 0 10px">पत्ता, मोबाईल, नातेवाईक, गुप्त शेरा इ. उघडल्यास तुमचे नाव, वेळ व कारण लॉगमध्ये जाते. 2 मिनिटांनी आपोआप लपते.</p><button class="btn gold wide" id="sShow">पाहा (कारण द्या)</button>' : '<p class="hint" style="margin:0">संवेदनशील माहिती भरलेली नाही.</p>') + '</div>';
-      h += '</div>';
+        ['नोंद', dmy(r.created) + ' (' + r.cBy + ')'], ['शेवटचा बदल', dmy(r.updated) + ' (' + r.uBy + ')']]) || '<div class="empty">माहिती नाही.</div>') + '</div>';
+      if (me.full) {
+        h += '<div class="card sec sens"><div class="hd"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>संवेदनशील माहिती</span>';
+        if (r.sens) h += '<button class="btn ghost" id="sHide" style="padding:6px 12px">लपवा</button></div>' + (kv(Object.keys(L).map(function (k) { return [L[k], r.sens[k]]; })) || '<div class="empty">काही भरलेले नाही.</div>');
+        else h += '</div><div style="padding:0 14px 14px">' + (r.hasSens ? '<p class="hint" style="margin:0 0 10px">पत्ता, मोबाईल, नातेवाईक, गुप्त शेरा इ. उघडल्यास तुमचे नाव, वेळ व कारण लॉगमध्ये जाते. 2 मिनिटांनी आपोआप लपते.</p><button class="btn gold wide" id="sShow">पाहा (कारण द्या)</button>' : '<p class="hint" style="margin:0">संवेदनशील माहिती भरलेली नाही.</p>') + '</div>';
+        h += '</div>';
+      }
+      if (me.admin) h += '<div class="acts"><button class="btn danger" id="aDel">ही नोंद काढा</button></div>';
+    } else if (tab === 'checks') {
+      h += '<div class="card sec list">' + (ld ? skel(2) : chk.length ? chk.map(function (c) {
+        return '<div class="chk"><b>' + dmy(c.date) + ' • ' + esc(c.found) + '</b>' + (c.place ? ' • ' + esc(c.place) : '') + (c.remark ? '<div>' + esc(c.remark) + '</div>' : '') + '<div class="hint">' + esc(c.by) + '</div>' + attLinks(c.id) + '</div>';
+      }).join('') : '<div class="empty">अजून ' + (isH ? 'तपासणी' : 'शोध') + ' नोंद नाही.</div>') + '</div>';
+    } else if (tab === 'hist') {
+      h += '<div class="card sec">' + (ld ? skel(2) : hist.length ? '<div class="tl">' + hist.map(function (x) {
+        return '<div class="ev"><b>' + dmy(x.date) + ' • ' + esc(TRL[x.act] || x.act) + '</b>' + (x.from || x.to ? '<div>' + esc(x.from) + ' → ' + esc(x.to) + '</div>' : '') + (x.ordNo ? '<div>आदेश क्र. ' + esc(x.ordNo) + (x.ordDate ? ' दि. ' + dmy(x.ordDate) : '') + '</div>' : '') + (x.note ? '<div>' + esc(x.note) + '</div>' : '') + '<div class="hint">' + esc(x.by) + '</div>' + attLinks(x.id) + '</div>';
+      }).join('') + '</div>' : '<div class="empty">अजून बदल नाही.</div>') + '</div>';
+    } else if (tab === 'docs') {
+      h += '<div class="card sec list">' + (ld ? skel(2) : docs.length ? docs.map(function (d) {
+        return '<button class="doc" data-doc="' + esc(d.id) + '"><div class="di">' + (d.mime === 'application/pdf' ? 'PDF' : 'IMG') + '</div><div class="dm"><b>' + esc(d.kind) + '</b><span>' + esc(d.name) + ' • ' + kb(d.size) + ' • ' + dmy(d.created) + ' • ' + esc(d.by) + '</span></div></button>';
+      }).join('') : '<div class="empty">अजून कागदपत्र जोडलेले नाही.</div>') + '</div>';
+      if (me.w && me.full) h += '<div class="acts"><button class="btn pri wide" id="dAdd">+ कागदपत्र / फोटो जोडा</button></div>';
     }
-    if (me.w) h += '<div class="acts"><button class="btn pri" id="aAct">आदेश / अवस्था बदल</button><button class="btn" id="aStatus">स्थिती बदला</button><button class="btn" id="aCheck">तपासणी नोंद</button><button class="btn ghost" id="aEdit">माहिती बदला</button></div>';
-    h += '<h2 class="sec" style="margin-bottom:8px">तपासण्या (' + r.checks.length + ')</h2><div class="card sec list">' + (r.checks.length ? r.checks.map(function (c) {
-      return '<div class="chk"><b>' + dmy(c.date) + ' • ' + esc(c.found) + '</b>' + (c.place ? ' • ' + esc(c.place) : '') + (c.remark ? '<div>' + esc(c.remark) + '</div>' : '') + '<div class="hint">' + esc(c.by) + '</div></div>';
-    }).join('') : '<div class="empty">अजून तपासणी नोंद नाही.</div>') + '</div>';
-    h += '<h2 class="sec" style="margin-bottom:8px">इतिहास (' + (r.hist || []).length + ')</h2><div class="card sec list">' + ((r.hist || []).length ? r.hist.map(function (x) {
-      return '<div class="chk"><b>' + dmy(x.date) + ' • ' + esc(TRL[x.act] || x.act) + '</b>' + (x.from || x.to ? ' • ' + esc(x.from) + ' → ' + esc(x.to) : '') + (x.ordNo ? '<div>आदेश क्र. ' + esc(x.ordNo) + (x.ordDate ? ' दि. ' + dmy(x.ordDate) : '') + '</div>' : '') + (x.note ? '<div>' + esc(x.note) + '</div>' : '') + '<div class="hint">' + esc(x.by) + '</div></div>';
-    }).join('') : '<div class="empty">अजून बदल नाही.</div>') + '</div>';
-    if (me.admin) h += '<div class="acts"><button class="btn danger" id="aDel">ही नोंद काढा</button></div>';
     $('recBody').innerHTML = h;
     var on = function (id, f) { var el = $(id); if (el) el.onclick = f; };
     on('sShow', askSens); on('sHide', function () { clearTimeout(S.sensTimer); delete S.rec.sens; renderRec(); });
-    on('aStatus', statusDlg); on('aAct', actDlg); on('aCheck', checkDlg); on('aDel', delDlg);
+    on('aStatus', statusDlg); on('aAct', function () { actDlg(); }); on('aCheck', checkDlg); on('aDel', delDlg); on('dAdd', function () { docDlg(); });
+    on('phAdd', function () { docDlg(PHOTO); });
+    on('phImg', function () { dlg('<img src="' + S.rec.photo + '" style="width:100%;border-radius:12px" alt="">', function () {}, { ok: 'बंद करा', noCancel: 1 }); });
+    document.querySelectorAll('#recBody [data-tab]').forEach(function (x) { x.onclick = function () { S.recTab = x.getAttribute('data-tab'); renderRec(); }; });
+    document.querySelectorAll('#recBody [data-doc]').forEach(function (x) { x.onclick = function () { viewDoc(x.getAttribute('data-doc')); }; });
     on('aEdit', function () {
       if (S.rec.hasSens && me.full && !S.rec.sens) {
         call('view', { id: S.rec.id, full: true, why: 'नोंद दुरुस्ती' }).then(function (x) { S.rec.sens = x.sens; openForm(S.rec); }).catch(fail);
       } else openForm(S.rec);
     });
+  }
+  /* ---- कागदपत्र जोडणे / पाहणे ---- */
+  function prep(file, kind) {
+    return new Promise(function (res, rej) {
+      if (file.type === 'application/pdf') {
+        if (file.size > 5e6) return rej(new Error('PDF 5 MB पेक्षा मोठी आहे'));
+        var fr = new FileReader(); fr.onload = function () { res({ mime: file.type, data: String(fr.result).split(',')[1] }); }; fr.onerror = function () { rej(new Error('फाईल वाचता आली नाही')); }; fr.readAsDataURL(file); return;
+      }
+      if (!/^image\/(jpeg|png)$/.test(file.type)) return rej(new Error('फक्त PDF, JPG किंवा PNG चालेल'));
+      var img = new Image(), u = URL.createObjectURL(file);
+      img.onload = function () {
+        var ph = kind === PHOTO, max = ph ? 700 : 1800, k = Math.min(1, max / Math.max(img.width, img.height)), c = document.createElement('canvas'), x = c.getContext('2d');
+        c.width = Math.round(img.width * k); c.height = Math.round(img.height * k); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(u); res({ mime: 'image/jpeg', data: c.toDataURL('image/jpeg', ph ? 0.82 : 0.78).split(',')[1] });
+      };
+      img.onerror = function () { URL.revokeObjectURL(u); rej(new Error('फोटो वाचता आला नाही')); };
+      img.src = u;
+    });
+  }
+  function attachHtml(def, label) {
+    var me = S.boot.me; if (!me.w || !me.full) return '';
+    return '<label class="fl">' + esc(label || 'कागदपत्र / फोटो जोडा (ऐच्छिक)') + '</label><select class="f" id="dKind">' + S.boot.docKinds.map(function (k) { return '<option' + (k === def ? ' selected' : '') + '>' + esc(k) + '</option>'; }).join('') + '</select>' +
+      '<input class="f" type="file" id="dFile" accept="application/pdf,image/jpeg,image/png" style="margin-top:8px"><p class="hint">PDF / JPG / PNG, कमाल 5 MB. फक्त तुमच्या Drive च्या खाजगी फोल्डरमध्ये साठवले जाते.</p>';
+  }
+  /** खिडकी बंद होण्याआधी निवडलेली फाईल पकडतो; नंतर up(नोंद, ref) ने चढवतो */
+  function attach(b) {
+    var f = b.querySelector('#dFile'), k = b.querySelector('#dKind'), file = f && f.files[0], kind = k && k.value;
+    return function (recId, ref) {
+      if (!file) return Promise.resolve(false);
+      toast('कागदपत्र चढवत आहे…');
+      return prep(file, kind).then(function (x) { return call('upload', { id: recId, kind: kind, name: file.name, mime: x.mime, data: x.data, ref: ref || '' }); }).then(function () { return true; });
+    };
+  }
+  function docDlg(def) {
+    var r = S.rec;
+    dlg('<h3>कागदपत्र / फोटो जोडा</h3><p class="hint">' + esc(r.name) + '</p>' + attachHtml(def || 'न्यायालय आदेश', 'प्रकार निवडून फाईल जोडा'), function (b) {
+      var f = b.querySelector('#dFile'); if (!f || !f.files[0]) { toast('फाईल निवडा', true); return false; }
+      attach(b)(r.id, '').then(function () { toast('जोडले ✓'); return openRec(r.id); }).catch(fail);
+    });
+  }
+  function b64blob(d) {
+    var bin = atob(d.data), u8 = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+    var url = URL.createObjectURL(new Blob([u8], { type: d.mime })); (S.urls = S.urls || []).push(url); return url;
+  }
+  function viewDoc(id) {
+    call('getDoc', { id: id }).then(function (d) {
+      var url = b64blob(d);
+      dlg('<h3 style="word-break:break-all">' + esc(d.name) + '</h3>' + (d.mime === 'application/pdf' ? '<iframe src="' + url + '" style="width:100%;height:56vh;border:0;border-radius:10px;background:#fff"></iframe>' : '<img src="' + url + '" style="width:100%;border-radius:10px" alt="">') +
+        '<a class="btn ghost wide" style="display:block;text-align:center;text-decoration:none;margin-top:10px" href="' + url + '" download="' + esc(d.name) + '">डाउनलोड / उघडा</a>' +
+        (S.boot.me.w ? '<button class="btn danger wide" id="dDel" style="margin-top:8px">हे कागदपत्र काढा</button>' : ''), function () {}, { ok: 'बंद करा', noCancel: 1 });
+      var del = $('dDel'); if (del) del.onclick = function () {
+        if (!confirm('हे कागदपत्र काढायचे?')) return;
+        call('delDoc', { id: id }).then(function () { $('dlg').classList.remove('on'); $('dlgBx').innerHTML = ''; toast('काढले'); return openRec(S.rec.id); }).catch(fail);
+      };
+    }).catch(fail);
   }
   var WHY = ['तपास / शोध मोहीम', 'वॉरंट / समन्स बजावणी', 'निगराणी तपासणी', 'वरिष्ठांना माहिती', 'नोंद दुरुस्ती', 'इतर'];
   function askSens() {
@@ -590,7 +794,7 @@ body.hid .veil{display:grid}
   }
   function today() { return S.boot.today; }
   var TRL = { declare: 'फरार घोषित', caught: 'आरोपी सापडला / अटक', hsReq: 'निगराणी बंद करण्याची विनंती', hsClose: 'निगराणी बंद', hsReject: 'विनंती नाकारली', hsOpen: 'निगराणी सुरू', status: 'स्थिती बदल' };
-  function actDlg() {
+  function actDlg(pre) {
     var r = S.rec, me = S.boot.me, open = S.boot.cats[r.cat].open.indexOf(r.status) >= 0, a = [];
     if (r.cat === 'PAHIJE' && open) a.push('declare');
     if ((r.cat === 'PAHIJE' || r.cat === 'FARAR') && open) a.push('caught');
@@ -601,22 +805,24 @@ body.hid .veil{display:grid}
       if (me.admin && !open) a.push('hsOpen');
     }
     if (!a.length) { toast('या नोंदीसाठी कोणतीही कृती उपलब्ध नाही'); return; }
-    dlg('<h3>आदेश / अवस्था बदल</h3><label class="fl">कृती</label><select class="f" id="dAct">' + a.map(function (k) { return '<option value="' + k + '">' + esc(TRL[k]) + '</option>'; }).join('') + '</select>' +
+    dlg('<h3>आदेश / अवस्था बदल</h3><label class="fl">कृती</label><select class="f" id="dAct">' + a.map(function (k) { return '<option value="' + k + '"' + (k === pre ? ' selected' : '') + '>' + esc(TRL[k]) + '</option>'; }).join('') + '</select>' +
       '<p class="hint" id="dHint"></p><label class="fl">तारीख</label><input class="f" type="date" id="dDt" value="' + today() + '" max="' + today() + '">' +
       '<div id="dTo"><label class="fl">कारण</label><select class="f" id="dToV"><option>मृत</option><option>इतर कारण</option></select></div>' +
       '<div id="dOrd"><label class="fl" id="dOrdL">आदेश क्रमांक</label><input class="f" id="dOn" autocomplete="off"><label class="fl">आदेश तारीख</label><input class="f" type="date" id="dOd" max="' + today() + '"></div>' +
-      '<label class="fl">शेरा / तपशील</label><textarea class="f" id="dNote"></textarea>', function (b) {
-      var act = b.querySelector('#dAct').value;
+      '<label class="fl">शेरा / तपशील</label><textarea class="f" id="dNote"></textarea>' + attachHtml('SD नोंद पुरावा', 'पुरावा / आदेशाची PDF येथे जोडा'), function (b) {
+      var act = b.querySelector('#dAct').value, up = attach(b);
       call('transition', { id: r.id, act: act, date: b.querySelector('#dDt').value, to: b.querySelector('#dToV').value, ordNo: b.querySelector('#dOn').value, ordDate: b.querySelector('#dOd').value, note: b.querySelector('#dNote').value })
-        .then(function () { toast('नोंदवले ✓'); return call('init').then(function (x) { S.boot = x; renderHome(); }).catch(function () {}); }).then(function () { openRec(r.id); }).catch(fail);
+        .then(function (d) { return up(r.id, d.id); }).then(function () { toast('नोंदवले ✓'); return refresh(); }).then(function () { openRec(r.id); }).catch(fail);
     });
-    var HINT = { declare: 'न्यायालयाने फरार घोषित केल्याचा आदेश क्रमांक भरा. नोंद पाहिजे यादीतून फरार यादीत जाईल.', caught: 'आरोपी सापडला / अटक झाल्यास नोंद चालू यादीतून कमी होते.', hsReq: 'पो.स्टे. विनंती करते; SDPO पोलीस अधीक्षक कार्यालयाचा आदेश भरून निगराणी बंद करेल.', hsClose: 'पोलीस अधीक्षक कार्यालयाचा (LCB) आदेश क्रमांक व तारीख आवश्यक.', hsReject: 'नाकारण्याचे कारण शेऱ्यात लिहा.', hsOpen: 'पोलीस अधीक्षक कार्यालयाचा निगराणी उघडण्याचा आदेश क्रमांक व तारीख आवश्यक.' };
+    var HINT = { declare: 'न्यायालयाने फरार घोषित केल्याचा आदेश क्रमांक भरा. नोंद पाहिजे यादीतून फरार यादीत जाईल.', caught: 'आरोपी सापडला / अटक झाल्यास नोंद चालू यादीतून कमी होते. SD नोंदीची PDF पुरावा म्हणून जोडा.', hsReq: 'पो.स्टे. विनंती करते; SDPO पोलीस अधीक्षक कार्यालयाचा आदेश भरून निगराणी बंद करेल. मृत्यू दाखला जोडा.', hsClose: 'पोलीस अधीक्षक कार्यालयाचा (LCB) आदेश क्रमांक व तारीख आवश्यक.', hsReject: 'नाकारण्याचे कारण शेऱ्यात लिहा.', hsOpen: 'पोलीस अधीक्षक कार्यालयाचा निगराणी उघडण्याचा आदेश क्रमांक व तारीख आवश्यक.' };
+    var DK = { declare: 'न्यायालय आदेश', caught: 'SD नोंद पुरावा', hsReq: 'मृत्यू दाखला', hsClose: 'निगराणी आदेश (SP कार्यालय)', hsOpen: 'निगराणी आदेश (SP कार्यालय)' };
     var sync = function () {
-      var b = $('dlgBx'), k = b.querySelector('#dAct').value;
+      var b = $('dlgBx'), k = b.querySelector('#dAct').value, dk = b.querySelector('#dKind');
       b.querySelector('#dHint').textContent = HINT[k];
       b.querySelector('#dTo').hidden = !(k === 'hsReq' || k === 'hsClose');
       b.querySelector('#dOrd').hidden = k === 'caught' || k === 'hsReq' || k === 'hsReject';
       b.querySelector('#dOrdL').textContent = k === 'declare' ? 'न्यायालय आदेश क्रमांक' : 'पो. अधीक्षक कार्यालय आदेश क्रमांक';
+      if (dk && DK[k]) dk.value = DK[k];
     };
     $('dlgBx').querySelector('#dAct').onchange = sync; sync();
   }
@@ -625,23 +831,28 @@ body.hid .veil{display:grid}
     dlg('<h3>स्थिती बदला</h3><label class="fl">नवीन स्थिती</label><select class="f" id="dSt">' + st.map(function (s) { return '<option' + (s === r.status ? ' selected' : '') + '>' + esc(s) + '</option>'; }).join('') + '</select>' +
       '<label class="fl">तारीख</label><input class="f" type="date" id="dDt" value="' + today() + '" max="' + today() + '"><label class="fl">शेरा (उदा. अटक करणारे अधिकारी, कोर्ट)</label><input class="f" id="dNote" autocomplete="off">', function (b) {
       call('setStatus', { id: r.id, status: b.querySelector('#dSt').value, date: b.querySelector('#dDt').value, note: b.querySelector('#dNote').value })
-        .then(function () { toast('स्थिती बदलली ✓'); openRec(r.id); }).catch(fail);
+        .then(function () { toast('स्थिती बदलली ✓'); return refresh(); }).then(function () { openRec(r.id); }).catch(fail);
     });
   }
   function checkDlg() {
-    var r = S.rec;
-    dlg('<h3>तपासणी नोंद</h3><p class="hint">' + esc(r.name) + '</p><label class="fl">तारीख</label><input class="f" type="date" id="dDt" value="' + today() + '" max="' + today() + '">' +
-      '<label class="fl">काय आढळले</label><select class="f" id="dF">' + S.boot.found.map(function (f) { return '<option>' + esc(f) + '</option>'; }).join('') + '</select>' +
-      '<label class="fl">ठिकाण</label><input class="f" id="dPl" autocomplete="off"><label class="fl">शेरा</label><textarea class="f" id="dRm"></textarea>', function (b) {
-      call('addCheck', { id: r.id, date: b.querySelector('#dDt').value, found: b.querySelector('#dF').value, place: b.querySelector('#dPl').value, remark: b.querySelector('#dRm').value })
-        .then(function () { toast('तपासणी नोंदवली ✓'); openRec(r.id); }).catch(fail);
+    var r = S.rec, isH = r.cat === 'HS', opts = S.boot.foundBy[r.cat] || S.boot.found;
+    dlg('<h3>' + (isH ? 'तपासणी नोंद' : 'शोध नोंद') + '</h3><p class="hint">' + esc(r.name) + '</p><label class="fl">तारीख</label><input class="f" type="date" id="dDt" value="' + today() + '" max="' + today() + '">' +
+      '<label class="fl">' + (isH ? 'काय आढळले' : 'शोधाचा निकाल') + '</label><select class="f" id="dF">' + opts.map(function (f) { return '<option>' + esc(f) + '</option>'; }).join('') + '</select>' +
+      '<label class="fl">ठिकाण</label><input class="f" id="dPl" autocomplete="off"><label class="fl">शेरा</label><textarea class="f" id="dRm"></textarea>' + attachHtml('स्टेशन डायरी नोंद (CCTNS)', 'CCTNS मधील स्टेशन डायरी नोंदीची PDF येथे जोडा'), function (b) {
+      var found = b.querySelector('#dF').value, up = attach(b);
+      call('addCheck', { id: r.id, date: b.querySelector('#dDt').value, found: found, place: b.querySelector('#dPl').value, remark: b.querySelector('#dRm').value })
+        .then(function (d) { return up(r.id, d.id); }).then(function () { toast('नोंदवली ✓'); return refresh(); })
+        .then(function () { openRec(r.id); if (!isH && found === 'मिळून आला') setTimeout(askCaught, 350); }).catch(fail);
     });
+  }
+  function askCaught() {
+    dlg('<h3>आरोपी मिळून आला</h3><p class="hint">आता "सापडला / अटक" म्हणून नोंद करायची का? (SD नोंदीची PDF जोडता येईल)</p>', function () { setTimeout(function () { actDlg('caught'); }, 0); });
   }
   function delDlg() {
     var r = S.rec;
     dlg('<h3>नोंद काढायची?</h3><p class="hint">नोंद ॲपमधून दिसणे बंद होईल, पण Sheet मध्ये पुराव्यासाठी राहील. कारण लॉगमध्ये जाते.</p><label class="fl">कारण</label><input class="f" id="dWhy" autocomplete="off">', function (b) {
       var w = b.querySelector('#dWhy').value.trim(); if (!w) { toast('कारण लिहा', true); return false; }
-      call('remove', { id: r.id, why: w }).then(function () { toast('नोंद काढली'); closePg('recPg'); search(); }).catch(fail);
+      call('remove', { id: r.id, why: w }).then(function () { toast('नोंद काढली'); closePg('recPg'); return refresh(); }).catch(fail);
     });
   }
 
@@ -731,8 +942,7 @@ body.hid .veil{display:grid}
         return;
       }
       toast('जतन केले ✓'); closePg('formPg'); S.editing = null;
-      openRec(d.id);
-      if (S.list.length) search();
+      refresh(); openRec(d.id);
     }).catch(function (e) { $('fSave').disabled = false; fail(e); });
   }
 
@@ -913,7 +1123,7 @@ body.hid .veil{display:grid}
   }
 
   // सुरुवातीचे ॲनिमेशन: सुमारे 2.6 सेकंद, स्पर्श केल्यास लगेच बंद
-  (function () { var sp = $('splash'), done = function () { sp.classList.add('off'); setTimeout(function () { sp.remove(); }, 700); }; sp.onclick = done; setTimeout(done, 2600); })();
+  (function () { var sp = $('splash'), done = function () { sp.classList.add('off'); setTimeout(function () { sp.remove(); }, 700); }; sp.onclick = done; setTimeout(done, 1900); })();
   if ('serviceWorker' in navigator) window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
 })();
 </script>
