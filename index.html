@@ -202,7 +202,9 @@ body.hid .veil{display:grid}
   nav.bot button.add{color:#ffd966;margin-top:12px;border:1px dashed rgba(255,217,102,.45)}
   .grid{grid-template-columns:repeat(3,1fr);gap:16px}
   .cat{padding:20px}.cat b{font-size:38px}
-  #resList{display:grid;grid-template-columns:1fr 1fr}
+  #resList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+  #resList .it{min-width:0;overflow:hidden}
+  #resList .it *{min-width:0;overflow-wrap:anywhere}
   #resList .it:nth-child(odd){border-right:1px solid var(--line)}
   #resList .empty{grid-column:1/-1}
   .search input{font-size:17px}
