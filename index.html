@@ -457,6 +457,7 @@ nav.bot button.on:before{content:"";position:absolute;top:0;left:30%;right:30%;h
   var $ = function (id) { return document.getElementById(id); };
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function dmy(s) { return /^\d{4}-\d{2}-\d{2}/.test(s || '') ? s.slice(8, 10) + '/' + s.slice(5, 7) + '/' + s.slice(0, 4) + (s.length > 10 ? ' ' + s.slice(11, 16) : '') : (s || ''); }
+  var OFFICE = 'उपविभागीय कार्यालय, नागपूर';
   var COLORS = { FARAR: '#b91c1c', PAHIJE: '#c2410c', HS: '#1d4ed8', HADPAR: '#7c3aed' };
   var LETTER = { FARAR: 'फ', PAHIJE: 'पा', HS: 'नि', HADPAR: 'ह' };
 
@@ -957,6 +958,7 @@ nav.bot button.on:before{content:"";position:absolute;top:0;left:30%;right:30%;h
   function renderMore() {
     var me = S.boot.me, h = '<div class="mi" style="cursor:default"><div><b>' + esc(me.name) + ' (' + esc(me.id) + ')</b><small>' + esc(me.rl) + (me.ps ? ' • ' + esc(psName(me.ps)) : '') + '</small></div></div>';
     h += '<button class="mi" data-m="pw">पासवर्ड बदला<small></small></button>';
+    h += '<button class="mi" data-m="rep">आढावा अहवाल<small>प्रकार व पोलीस स्टेशन निहाय आरोपी संख्या (Word / PDF)</small></button>';
     if (me.full) h += '<button class="mi" data-m="exp">यादी काढा (Word / PDF)<small>अधिकृत यादीच्या स्वरूपात; कारण लॉगमध्ये जाते</small></button>';
     if (me.admin) {
       h += '<button class="mi" data-m="users">यूजर व अधिकार<small>नवीन यूजर, पासवर्ड रीसेट, बंद/चालू</small></button>';
@@ -978,6 +980,7 @@ nav.bot button.on:before{content:"";position:absolute;top:0;left:30%;right:30%;h
     users: function () { call('users').then(showUsers).catch(fail); },
     log: function () { showLog(''); },
     exp: expDlg,
+    rep: function () { showReport(); },
     priv: function () {
       $('mTitle').textContent = 'गोपनीयता'; $('mSub').textContent = '';
       $('mBody').innerHTML = '<div class="card sec" style="padding:4px 16px 12px;font-size:15px"><ul style="padding-left:18px">' + [
@@ -1041,6 +1044,41 @@ nav.bot button.on:before{content:"";position:absolute;top:0;left:30%;right:30%;h
       $('lgF').onsubmit = function (e) { e.preventDefault(); showLog($('lgQ').value); };
       openPg('miscPg');
     }).catch(fail);
+  }
+  /* ---- आढावा अहवाल: प्रकार × पो.स्टे. संख्या (ॲपमधील नोंदींवरून, फक्त आकडे) ---- */
+  function sum(a) { return a.reduce(function (t, v) { return t + v; }, 0); }
+  function reportSecs(onlyOpen) {
+    var b = S.boot, cats = Object.keys(b.cats), pss = b.ps, recs = b.recs.filter(function (r) { return !onlyOpen || isOpen(r); });
+    var cnt = function (f) { return recs.filter(f).length; }, sc = onlyOpen ? ' (चालू नोंदी)' : ' (सर्व नोंदी)';
+    var head = ['अ.क्र.', 'पोलीस स्टेशन'].concat(cats.map(function (c) { return b.cats[c].l; }), ['एकूण']);
+    var body = pss.map(function (p, i) { var row = cats.map(function (c) { return cnt(function (r) { return r.ps === p[0] && r.cat === c; }); }); return [String(i + 1), p[1]].concat(row.map(String), [String(sum(row))]); });
+    var tot = cats.map(function (c) { return cnt(function (r) { return r.cat === c; }); });
+    body.push(['', 'एकूण'].concat(tot.map(String), [String(sum(tot))]));
+    var cw = Math.floor(60 / cats.length);
+    var secs = [{ title: OFFICE + ' • प्रकार व पोलीस स्टेशन निहाय आरोपी संख्या' + sc, head: head, body: body, w: [6, 22].concat(cats.map(function () { return cw; }), [100 - 28 - cw * cats.length]) }];
+    cats.forEach(function (c) {
+      var pw = Math.floor(70 / pss.length);
+      var bd = b.cats[c].st.map(function (st) { var row = pss.map(function (p) { return cnt(function (r) { return r.cat === c && r.status === st && r.ps === p[0]; }); }); return [st].concat(row.map(String), [String(sum(row))]); });
+      bd = bd.filter(function (r) { return r[r.length - 1] !== '0'; });
+      if (!bd.length) return;
+      secs.push({ title: b.cats[c].l + ': स्थितीनुसार, पोलीस स्टेशन निहाय संख्या' + sc, head: ['स्थिती'].concat(pss.map(function (p) { return p[1]; }), ['एकूण']), body: bd, w: [30].concat(pss.map(function () { return pw; }), [100 - 30 - pw * pss.length]) });
+    });
+    return secs;
+  }
+  function showReport() {
+    var me = S.boot.me;
+    $('mTitle').textContent = 'आढावा अहवाल'; $('mSub').textContent = OFFICE;
+    var draw = function () {
+      var only = $('rOpen').value === '1', secs = reportSecs(only), d = { by: me.name, at: S.boot.today + ' ' + new Date().toTimeString().slice(0, 5) };
+      $('rTabs').innerHTML = secs.map(function (sc, i) {
+        return '<div class="card sec" style="overflow-x:auto"><h3 style="margin:14px 16px 4px;font-size:15px">' + esc(sc.title) + '</h3><table class="tbl" style="margin:6px 8px 12px;width:calc(100% - 16px)"><thead><tr>' + sc.head.map(function (h, k) { return '<th style="text-align:' + (k > 1 || (i > 0 && k > 0) ? 'center' : 'left') + ';padding:6px 8px;border-bottom:2px solid var(--line);font-size:12.5px;color:var(--muted)">' + esc(h) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+          sc.body.map(function (r, j) { var last = i === 0 && j === sc.body.length - 1; return '<tr' + (last ? ' style="font-weight:800;background:var(--bg)"' : '') + '>' + r.map(function (c, k) { return '<td style="' + (k > 1 || (i > 0 && k > 0) ? 'text-align:center;' : '') + 'color:var(--ink)">' + esc(c) + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table></div>';
+      }).join('');
+      $('rPdf').onclick = function () { toPrint(secs, d); };
+      $('rDoc').onclick = function () { toDocx(secs, d); };
+    };
+    $('mBody').innerHTML = '<div class="card sec" style="padding:14px"><label class="fl" style="margin-top:0">काय मोजायचे</label><select class="f" id="rOpen"><option value="1">फक्त चालू नोंदी</option><option value="0">सर्व नोंदी (सापडलेल्यांसह)</option></select><div class="acts" style="margin:12px 0 0"><button class="btn pri" id="rPdf">PDF</button><button class="btn" id="rDoc">Word</button></div></div><div id="rTabs"></div>';
+    $('rOpen').onchange = draw; draw(); openPg('miscPg');
   }
   function expDlg() {
     var b = S.boot;
