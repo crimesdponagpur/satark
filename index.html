@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; frame-src blob:; connect-src https://script.google.com https://*.googleusercontent.com; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="robots" content="noindex, nofollow">
 <title>सतर्क</title>
 <meta name="theme-color" content="#0b1f4b">
@@ -970,6 +971,7 @@ nav.bot button.on:before{content:"";position:absolute;top:0;left:30%;right:30%;h
     var me = S.boot.me, h = '<div class="mi" style="cursor:default"><div><b>' + esc(me.name) + ' (' + esc(me.id) + ')</b><small>' + esc(me.rl) + (me.ps ? ' • ' + esc(psName(me.ps)) : '') + '</small></div></div>';
     h += '<button class="mi" data-m="pw">पासवर्ड बदला<small></small></button>';
     h += '<button class="mi" data-m="rep">आढावा अहवाल<small>प्रकार व पोलीस स्टेशन निहाय आरोपी संख्या (Word / PDF)</small></button>';
+    if (me.full && me.w !== false) h += '<button class="mi" data-m="imp">प्रस्ताव यादी आयात<small>Excel / Word / CSV फाईल अपलोड करून हद्दपार प्रस्ताव भरा</small></button>';
     if (me.full) h += '<button class="mi" data-m="exp">यादी काढा (Word / PDF)<small>अधिकृत यादीच्या स्वरूपात; कारण लॉगमध्ये जाते</small></button>';
     if (me.admin) {
       h += '<button class="mi" data-m="users">यूजर व अधिकार<small>नवीन यूजर, पासवर्ड रीसेट, बंद/चालू</small></button>';
@@ -991,6 +993,7 @@ nav.bot button.on:before{content:"";position:absolute;top:0;left:30%;right:30%;h
     users: function () { call('users').then(showUsers).catch(fail); },
     log: function () { showLog(''); },
     exp: expDlg,
+    imp: impPage,
     rep: function () { showReport(); },
     priv: function () {
       $('mTitle').textContent = 'गोपनीयता'; $('mSub').textContent = '';
@@ -1181,6 +1184,220 @@ nav.bot button.on:before{content:"";position:absolute;top:0;left:30%;right:30%;h
       setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
       toast('Word फाईल डाउनलोड झाली. काम झाल्यावर ती हटवा.');
     }).catch(fail);
+  }
+
+  // ---------- प्रस्ताव यादी आयात (Excel / CSV / Word) ----------
+  /* फाईल ब्राउझरमध्येच वाचली जाते; माहिती फक्त तुमच्या सर्व्हरवर (नेहमीच्या "जतन" ने) जाते. PDF वरून सारणी विश्वासार्हपणे वाचता येत नाही, म्हणून Excel / Word / CSV वापरा. */
+  var IMP = { rows: [] };
+  var IMPH = ['अ.क्र.', 'पोलीस स्टेशन', 'आरोपीचे पूर्ण नाव', 'वय', 'गाव / रा.', 'प्रस्ताव तारीख', 'सध्याचा टप्पा', 'टप्पा तारीख', 'सद्यस्थिती / शेरा', 'मंजूर कालावधी (महिने)', 'आदेश क्र.', 'आदेश तारीख', 'हद्दपारी संपण्याची तारीख', 'नामंजुरी कारण-कोड'];
+  function nt(s) { return String(s == null ? '' : s).replace(/[‌‍﻿]/g, '').replace(/\s+/g, ' ').trim(); }
+  function colKey(h) {
+    h = nt(h);
+    if (!h || /^अ\.?\s*क्र/.test(h)) return '';
+    if (/कारण/.test(h)) return 'rcode';
+    if (/आदेश/.test(h)) return /तारीख|दि\./.test(h) ? 'ordDate' : 'ordNo';
+    if (/संपण्या|पर्यंत/.test(h)) return 'endDate';
+    if (/कालावधी|महिन/.test(h)) return 'months';
+    if (/प्रस्ताव/.test(h) && /तारीख|सादर|दि\./.test(h)) return 'pDate';
+    if (/टप्पा/.test(h) && /तारीख|दि\./.test(h)) return 'sDate';
+    if (/टप्पा|प्रस्ताव\s*स्थिती/.test(h)) return 'stage';
+    if (/सद्यस्थिती|शेरा/.test(h)) return 'remark';
+    if (/पोलीस|पो\.\s*स्टे|ठाणे/.test(h)) return 'ps';
+    if (/वडील/.test(h)) return 'father';
+    if (/नाव/.test(h) && /पत्ता|वय/.test(h)) return 'nameaddr';
+    if (/नाव/.test(h)) return 'name';
+    if (/^वय/.test(h)) return 'age';
+    if (/गाव|^रा\./.test(h)) return 'village';
+    return '';
+  }
+  function isoDate(v) {
+    v = nt(v); if (!v) return '';
+    var m;
+    if (/^\d{5}(\.\d+)?$/.test(v) && +v > 20000 && +v < 80000) return new Date(Date.UTC(1899, 11, 30) + Math.floor(+v) * 864e5).toISOString().slice(0, 10);
+    if ((m = v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/))) return m[1] + '-' + ('0' + m[2]).slice(-2) + '-' + ('0' + m[3]).slice(-2);
+    if ((m = v.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2}|\d{4})$/))) return (m[3].length === 2 ? '20' + m[3] : m[3]) + '-' + ('0' + m[2]).slice(-2) + '-' + ('0' + m[1]).slice(-2);
+    return '';
+  }
+  function addMonths(iso, n) {
+    var p = iso.split('-'), d = new Date(Date.UTC(+p[0], +p[1] - 1 + n, +p[2]));
+    if (d.getUTCDate() !== +p[2]) d = new Date(Date.UTC(+p[0], +p[1] - 1 + n + 1, 0));
+    return d.toISOString().slice(0, 10);
+  }
+  function stageOf(s) {
+    s = nt(s);
+    if (/नामंजु|नामंजू/.test(s)) return 'नामंजूर';
+    if (/मंजु|मंजू/.test(s)) return 'मंजूर';
+    if (/रद्द|रदद/.test(s)) return 'रद्द';
+    if (/SDM|एस\s*डी\s*एम/i.test(s)) return 'SDM प्रलंबित';
+    if (/SDPO|एसडीपीओ/i.test(s)) return 'SDPO प्रलंबित';
+    return s;
+  }
+  function csvRows(t) {
+    var rows = [], row = [], cur = '', q = false, i, c;
+    t = t.replace(/^﻿/, '');
+    for (i = 0; i < t.length; i++) {
+      c = t[i];
+      if (q) { if (c === '"') { if (t[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += c; }
+      else if (c === '"') q = true;
+      else if (c === ',' || c === '\t') { row.push(cur); cur = ''; }
+      else if (c === '\n' || c === '\r') { if (c === '\r' && t[i + 1] === '\n') i++; row.push(cur); rows.push(row); row = []; cur = ''; }
+      else cur += c;
+    }
+    if (cur !== '' || row.length) { row.push(cur); rows.push(row); }
+    return rows;
+  }
+  function xmlDoc(s) { return new DOMParser().parseFromString(s, 'application/xml'); }
+  function xlsxMatrix(buf) {
+    return loadZip().then(function () { return JSZip.loadAsync(buf); }).then(function (z) {
+      var get = function (p) { var f = z.file(p); return f ? f.async('string') : Promise.resolve(''); };
+      return Promise.all([get('xl/workbook.xml'), get('xl/_rels/workbook.xml.rels'), get('xl/sharedStrings.xml')]).then(function (a) {
+        var wb = xmlDoc(a[0]), rel = xmlDoc(a[1]), ss = xmlDoc(a[2]);
+        var strs = [].map.call(ss.getElementsByTagName('si'), function (si) { return [].map.call(si.getElementsByTagName('t'), function (t) { return t.textContent; }).join(''); });
+        var sheets = [].slice.call(wb.getElementsByTagName('sheet'));
+        var load = function (sh) {
+          var rid = sh.getAttribute('r:id') || sh.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'id');
+          var rl = [].filter.call(rel.getElementsByTagName('Relationship'), function (r) { return r.getAttribute('Id') === rid; })[0];
+          if (!rl) return Promise.resolve([]);
+          var tg = rl.getAttribute('Target').replace(/^\//, ''); if (!/^xl\//.test(tg)) tg = 'xl/' + tg;
+          return get(tg).then(function (x) {
+            var out = [];
+            [].forEach.call(xmlDoc(x).getElementsByTagName('row'), function (r) {
+              var arr = [];
+              [].forEach.call(r.getElementsByTagName('c'), function (c) {
+                var ref = c.getAttribute('r') || '', col = 0, i;
+                for (i = 0; i < ref.length && /[A-Z]/i.test(ref[i]); i++) col = col * 26 + ref.charCodeAt(i) - 64 - (ref.charCodeAt(i) > 90 ? 32 : 0);
+                col = Math.max(col - 1, 0);
+                var t = c.getAttribute('t'), v = c.getElementsByTagName('v')[0], is = c.getElementsByTagName('is')[0], val = '';
+                if (t === 's' && v) val = strs[+v.textContent] || '';
+                else if (t === 'inlineStr' && is) val = [].map.call(is.getElementsByTagName('t'), function (q) { return q.textContent; }).join('');
+                else if (v) val = v.textContent;
+                arr[col] = val;
+              });
+              out.push(arr);
+            });
+            return out;
+          });
+        };
+        var main = sheets.filter(function (s) { return /प्रस्ताव/.test(s.getAttribute('name') || ''); })[0] || sheets[0];
+        var leg = sheets.filter(function (s) { return /कारण/.test(s.getAttribute('name') || ''); })[0];
+        return load(main).then(function (m) { return (leg ? load(leg) : Promise.resolve([])).then(function (l) { var map = {}; l.forEach(function (r) { if (r[0] && r[1]) map[nt(r[0])] = nt(r[1]); }); return { m: m, legend: map }; }); });
+      });
+    });
+  }
+  function docxMatrix(buf) {
+    return loadZip().then(function () { return JSZip.loadAsync(buf); }).then(function (z) {
+      var f = z.file('word/document.xml'); if (!f) throw new Error('Word फाईल वाचता आली नाही');
+      return f.async('string');
+    }).then(function (x) {
+      var W = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main', d = xmlDoc(x), tbls = d.getElementsByTagNameNS(W, 'tbl'), best = [];
+      [].forEach.call(tbls, function (t) {
+        var rows = [].map.call(t.getElementsByTagNameNS(W, 'tr'), function (tr) {
+          return [].map.call(tr.getElementsByTagNameNS(W, 'tc'), function (tc) {
+            return [].map.call(tc.getElementsByTagNameNS(W, 'p'), function (p) { return [].map.call(p.getElementsByTagNameNS(W, 't'), function (q) { return q.textContent; }).join(''); }).join(' ');
+          });
+        });
+        if (rows.length > best.length) best = rows;
+      });
+      if (best.length < 2) throw new Error('Word फाईलमध्ये सारणी (table) सापडली नाही');
+      return { m: best, legend: {} };
+    });
+  }
+  function readMatrix(file) {
+    var n = file.name.toLowerCase();
+    if (/\.pdf$/.test(n)) return Promise.reject(new Error('PDF मधून सारणी अचूक वाचता येत नाही (चुकीची नावे जाण्याचा धोका). Excel, Word किंवा CSV फाईल वापरा.'));
+    if (file.size > 5 * 1048576) return Promise.reject(new Error('फाईल 5 MB पेक्षा मोठी आहे'));
+    if (/\.csv$|\.txt$/.test(n)) return file.text().then(function (t) { return { m: csvRows(t), legend: {} }; });
+    return file.arrayBuffer().then(function (buf) {
+      if (/\.xlsx$/.test(n)) return xlsxMatrix(buf);
+      if (/\.docx$/.test(n)) return docxMatrix(buf);
+      throw new Error('फक्त .xlsx, .docx किंवा .csv फाईल चालेल');
+    });
+  }
+  function buildRecs(res) {
+    var m = res.m, hi = -1, map = {}, i, j;
+    for (i = 0; i < Math.min(m.length, 15) && hi < 0; i++) {
+      var tmp = {}, has = 0;
+      (m[i] || []).forEach(function (h, k) { var key = colKey(h); if (key && !(key in tmp)) { tmp[key] = k; if (key === 'name' || key === 'nameaddr') has = 1; } });
+      if (has) { hi = i; map = tmp; }
+    }
+    if (hi < 0) throw new Error('शीर्षक ओळ सापडली नाही. "आरोपीचे पूर्ण नाव" हा कॉलम आवश्यक आहे.');
+    var b = S.boot, me = b.me, out = [];
+    var psMatch = function (v) {
+      v = nt(v).replace(/\s/g, ''); if (!v) return '';
+      var f = (b.ps || []).filter(function (p) { return p[0] === v || nt(p[1]).replace(/\s/g, '') === v; })[0] || (b.ps || []).filter(function (p) { var n = nt(p[1]).replace(/\s/g, ''); return n.indexOf(v) >= 0 || v.indexOf(n) >= 0; })[0];
+      return f ? f[0] : '';
+    };
+    var st = (b.cats.HADPAR && b.cats.HADPAR.st) || [];
+    for (i = hi + 1; i < m.length; i++) {
+      var r = m[i] || [], g = function (k) { return k in map ? nt(r[map[k]]) : ''; }, rec = { row: i + 1, err: '', warn: '' };
+      var name = g('name'), age = g('age'), village = g('village');
+      if (!name && g('nameaddr')) {
+        var na = g('nameaddr'), mm = na.match(/^(.*?)\s*(?:वय|व)\s*(\d{1,3})\s*(?:वर्ष|वर्षे)?\s*(?:रा\.?|राहणार)?\s*[-–:]?\s*(.*)$/);
+        if (mm) { name = nt(mm[1]); age = mm[2]; village = nt(mm[3]); } else name = na;
+      }
+      if (!name) continue;
+      rec.name = name; rec.age = /^\d{1,3}$/.test(age) ? age : (nt(age).match(/\d{1,3}/) || [''])[0]; rec.village = village; rec.father = g('father');
+      rec.psRaw = g('ps'); rec.ps = psMatch(rec.psRaw) || (me.ps || '');
+      if (!rec.ps) rec.err = 'पोलीस स्टेशन ओळखता आले नाही';
+      else if (!me.all && me.ps && rec.ps !== me.ps) rec.err = 'हे तुमचे पोलीस स्टेशन नाही';
+      rec.pDate = isoDate(g('pDate')); rec.sDate = isoDate(g('sDate'));
+      if (g('pDate') && !rec.pDate) rec.warn = 'प्रस्ताव तारीख वाचता आली नाही';
+      rec.stage = stageOf(g('stage'));
+      rec.months = (g('months').match(/\d+/) || [''])[0];
+      if (!rec.months && rec.stage === 'मंजूर') rec.months = ((g('remark').match(/(\d+)\s*महिन/) || [])[1]) || '';
+      rec.ordNo = g('ordNo'); rec.ordDate = isoDate(g('ordDate'));
+      var rc = g('rcode'), rm = g('remark');
+      if (!rm && rc) rm = (res.legend && res.legend[rc]) || ('कारण-कोड ' + rc);
+      rec.remark = rm;
+      if (rec.ordDate && rec.months) { rec.fromDate = rec.ordDate; rec.toDate = addMonths(rec.ordDate, +rec.months); }
+      var ex = (rec.stage && (st.filter(function (s) { return s === rec.stage; })[0] || st.filter(function (s) { return s.indexOf(rec.stage) >= 0; })[0])) || '';
+      rec.status = ex;
+      rec.warrant = ['कलम 56 म.पो.का. प्रस्ताव', rec.pDate ? 'प्रस्ताव दि. ' + dmy(rec.pDate) : '', rec.stage ? 'टप्पा: ' + rec.stage : '', rm ? 'सद्यस्थिती: ' + rm : '', rec.months ? 'मंजूर कालावधी: ' + rec.months + ' महिने' : ''].filter(Boolean).join(' • ');
+      out.push(rec);
+    }
+    if (!out.length) throw new Error('फाईलमध्ये एकही नोंद सापडली नाही');
+    return out;
+  }
+  function impPage() {
+    $('mTitle').textContent = 'प्रस्ताव यादी आयात'; $('mSub').textContent = 'Excel / Word / CSV';
+    $('mBody').innerHTML = '<div class="card sec fbox"><p class="hint" style="margin-top:12px">फाईल निवडा. सर्व नोंदी आधी तपासणीसाठी दिसतील; तुम्ही "आयात करा" दाबल्यावरच जतन होतात. आधीपासून असलेली (तेच नाव) नोंद वगळली जाते. नोंदी "हद्दपार" प्रकारात बनतात.</p>' +
+      '<label class="fl" for="iFile">फाईल (.xlsx / .docx / .csv)</label><input class="f" type="file" id="iFile" accept=".xlsx,.docx,.csv,.txt">' +
+      '<div class="acts" style="margin:14px 0 0"><button class="btn ghost" id="iTpl" type="button">रिकामा साचा (CSV) डाउनलोड</button></div>' +
+      '<div id="iOut"></div></div>';
+    openPg('miscPg');
+    $('iTpl').onclick = function () {
+      var blob = new Blob(['﻿' + IMPH.join(',') + '\r\n'], { type: 'text/csv;charset=utf-8' }), a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = 'प्रस्ताव_यादी_साचा.csv'; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+    };
+    $('iFile').onchange = function () {
+      var f = this.files[0]; $('iOut').innerHTML = ''; if (!f) return;
+      readMatrix(f).then(buildRecs).then(function (recs) { IMP.rows = recs; impPreview(); }).catch(function (e) { $('iFile').value = ''; fail(e); });
+    };
+  }
+  function impPreview() {
+    var rs = IMP.rows, ok = rs.filter(function (r) { return !r.err; }).length;
+    var h = '<h3>तपासणी: ' + rs.length + ' नोंदी, ' + ok + ' आयात होतील' + (rs.length - ok ? ', ' + (rs.length - ok) + ' वगळल्या' : '') + '</h3>' +
+      '<div style="overflow-x:auto"><table class="tbl"><tr><td>ओळ</td><td>नाव</td><td>वय</td><td>गाव</td><td>पो.स्टे.</td><td>प्रस्ताव</td><td>टप्पा</td><td>तपासणी</td></tr>' +
+      rs.map(function (r) { return '<tr><td>' + r.row + '</td><td>' + esc(r.name) + '</td><td>' + esc(r.age) + '</td><td>' + esc(r.village) + '</td><td>' + esc(r.ps ? psName(r.ps) : r.psRaw) + '</td><td>' + esc(dmy(r.pDate)) + '</td><td>' + esc(r.stage) + '</td><td>' + (r.err ? '<span class="pill bad">' + esc(r.err) + '</span>' : r.warn ? '<span class="pill warn">' + esc(r.warn) + '</span>' : '<span class="pill ok">ठीक</span>') + '</td></tr>'; }).join('') + '</table></div>' +
+      '<div class="acts"><button class="btn gold wide" id="iGo"' + (ok ? '' : ' disabled') + '>' + ok + ' नोंदी आयात करा</button></div><div id="iProg" class="hint" style="margin-top:10px"></div>';
+    $('iOut').innerHTML = h;
+    $('iGo').onclick = impRun;
+  }
+  function impRun() {
+    var rs = IMP.rows.filter(function (r) { return !r.err; }), n = 0, dup = 0, bad = [], i = 0;
+    $('iGo').disabled = true; $('iFile').disabled = true;
+    var next = function () {
+      if (i >= rs.length) {
+        IMP.rows = [];
+        $('iProg').innerHTML = '<b>पूर्ण:</b> ' + n + ' नवीन नोंदी जतन, ' + dup + ' आधीच होत्या (वगळल्या)' + (bad.length ? ', ' + bad.length + ' अयशस्वी: ' + esc(bad.join('; ')) : '') + '.';
+        $('iFile').value = ''; $('iFile').disabled = false; toast('आयात पूर्ण: ' + n + ' नोंदी'); refresh(); return;
+      }
+      var r = rs[i++], p = { force: false, cat: 'HADPAR', ps: r.ps, name: r.name, age: r.age, village: r.village, father: r.father, warrant: r.warrant, ordNo: r.ordNo, ordDate: r.ordDate, fromDate: r.fromDate || '', toDate: r.toDate || '', statusDate: r.sDate || r.pDate || '' };
+      if (r.status) p.status = r.status;
+      $('iProg').textContent = 'जतन होत आहे… ' + i + ' / ' + rs.length;
+      call('save', p).then(function (d) { if (d && d.dup) dup++; else n++; next(); }, function (e) { bad.push(r.name + ' (' + e.message + ')'); if (bad.length >= 3) { $('iProg').innerHTML = esc('थांबवले: ' + bad.join('; ')) + '<br>' + n + ' जतन झाल्या.'; $('iGo').disabled = false; $('iFile').disabled = false; refresh(); return; } next(); });
+    };
+    next();
   }
 
   // सुरुवातीचे ॲनिमेशन: सुमारे 2.6 सेकंद, स्पर्श केल्यास लगेच बंद
